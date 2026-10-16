@@ -88,6 +88,8 @@
       var stop = age === false ? ['under 18', 'Our caregivers need to be 18 or older, so we are not able to take your application further right now.', 'If you are turning 18 soon, please apply again then. We would be glad to hear from you.']
         : auth === false ? ['not authorized to work in the US', 'We are only able to hire people who are authorized to work in the United States.', 'If your situation changes, you would be welcome to apply again.']
         : oks === false ? ['would not agree to the OKSCREEN fingerprint check', 'Every caregiver in Oklahoma has to pass an OKSCREEN fingerprint background check before working with clients, so we are not able to take your application further.', 'If you change your mind, you would be welcome to apply again.']
+        /* her rule 2026-10-16: "every employee has to be able to drive clients" */
+        : drive === false ? ['cannot drive clients', 'Every Companion drives clients to appointments, errands and outings, so a driver\'s license, a reliable car and auto insurance are a must for this job.', 'If that changes, you would be welcome to apply again.']
         : wk === 'No weekday hours' ? ['no weekday hours between 8am and 6pm', 'All of our visits are on weekdays between 8am and 6pm, so we are not able to offer you work right now.', 'If your weekdays open up, please apply again.']
         : null;
       if (stop) d2.decline_reason = stop[0];

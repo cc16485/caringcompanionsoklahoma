@@ -732,7 +732,7 @@ def apply_form():
   <fieldset class="join-ints"><legend>A little more about you</legend>
     <label><input type="checkbox" name="interests" value="weekdays-all"> I can work most weekdays, 8am to 6pm</label>
     <label><input type="checkbox" name="interests" value="weekdays-some"> I can work some weekdays</label>
-    <label><input type="checkbox" name="interests" value="drives"> I have a driver's license, a car and auto insurance</label>
+    <label><input type="checkbox" name="interests" value="drives"> I have a driver's license, a reliable car and auto insurance</label>
     <label><input type="checkbox" name="interests" value="cna-or-hha"> I have a CNA, HHA or similar certificate</label>
   </fieldset>
   <label>When could you start?<select name="timing"><option value="">Choose one</option><option>Early 2027</option><option>Spring 2027</option><option>When you open</option></select></label>
@@ -785,7 +785,7 @@ def companion_application():
     {yn("work_auth", "Are you legally allowed to work in the United States?")}
     {yn("okscreen", "Will you agree to an OKSCREEN fingerprint background check?")}
     {pick("weekdays", "Which weekday hours between 8am and 6pm can you work?", ["All weekdays", "Some weekdays", "No weekday hours"])}
-    {yn("drive", "Do you have a driver's license, a car and auto insurance to drive clients?")}
+    {yn("drive", "Do you have a driver's license, a reliable car and auto insurance? Every Companion drives clients.")}
     <label>Experience with older adults<select name="experience_years"><option value="">Choose one</option><option>None yet</option><option>Less than 1 year</option><option>1 to 3 years</option><option>More than 3 years</option></select></label>
     <label>When can you start?<select name="start"><option value="">Choose one</option><option>Now, for training</option><option>Spring 2027</option><option>When you open in June 2027</option></select></label>
     <div class="btn-row"><button class="btn" type="button" data-go="2">Next</button><button class="btn btn-outline" type="button" data-go="back2">Back</button></div>
@@ -845,7 +845,7 @@ def page_careers():
     <ul class="checks">
       <li>A kind, patient, dependable way with people</li>
       <li>To pass a fingerprint background check through Oklahoma's OKSCREEN program</li>
-      <li>A valid driver's license and auto insurance, if you'll drive clients</li>
+      <li>A valid driver's license, a reliable car and auto insurance. Every Companion drives clients.</li>
     </ul>
     <h3>What happens next</h3>
     <p>When hiring opens, we'll email you the application. It takes about two minutes, no resume needed. If it looks like a fit, we'll call you to set up an interview in Mustang.</p>
