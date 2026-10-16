@@ -381,3 +381,18 @@ p { margin: 0 0 16px; }
 .towns a { color: var(--navy); text-decoration: none; }
 .towns li:has(a):hover { border-color: var(--teal); }
 .footer-towns { margin: 28px 0 0; font-size: 14.5px; line-height: 1.9; }
+/* not open yet: sign-ups + booking steps */
+.notify-sec { background: linear-gradient(180deg, #FBEFD9 0%, #faf9f6 70%); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.notify-head { max-width: 760px; }
+.notify-grid { margin-top: 24px; align-items: stretch; }
+.notify-card .notify-form { margin-top: 12px; padding: 0; box-shadow: none; border: 0; background: none; }
+.notify-card h3 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pay-chip { background: var(--teal); color: #fff; border-radius: 999px; padding: 3px 12px; font-family: Inter, system-ui, sans-serif; font-size: 14px; font-weight: 700; }
+.how-book { margin-top: 22px; }
+.how-steps { list-style: none; counter-reset: hs; padding: 0; margin: 14px 0 18px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.how-steps li { counter-increment: hs; background: var(--teal-pale); border-radius: 14px; padding: 12px; display: grid; gap: 2px; }
+.how-steps li::before { content: counter(hs); display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--teal); color: #fff; font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+.how-steps b { color: var(--navy); }
+.how-steps span { color: var(--muted, #55677a); font-size: 14px; }
+@media (max-width: 860px) { .how-steps { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .how-steps { grid-template-columns: 1fr; } }

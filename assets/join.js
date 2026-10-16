@@ -33,6 +33,7 @@
       var name = (f.get('name') || '').trim(), email = (f.get('email') || '').trim(), phone = (f.get('phone') || '').trim();
       var zip = (f.get('zip') || '').replace(/\D/g, '').slice(0, 5);
       status.className = 'join-status';
+      if (form.hasAttribute('data-need-email') && (!name || !email)) { status.textContent = 'Please add your name and email.'; status.classList.add('err'); return; }
       if (!name || (!email && !phone)) { status.textContent = 'Please add your name and an email or phone number so we can reach you.'; status.classList.add('err'); return; }
       if (zip && zip.length !== 5) { status.textContent = 'Please check the ZIP code (5 digits).'; status.classList.add('err'); return; }
       var row = {
@@ -62,7 +63,7 @@
         form.reset(); syncKind();
         form.classList.add('join-done');
         status.classList.add('ok');
-        status.textContent = row.kind === 'caregiver'
+        status.textContent = form.getAttribute('data-ok') ? form.getAttribute('data-ok') : row.kind === 'caregiver'
           ? 'Thank you! We have your application for the Mustang team. If it looks like a fit, we’ll call you to set up an interview.'
           : 'Thank you! You’re on our opening list.';
         try { if (window.ccTrack) window.ccTrack('join_list', { kind: row.kind, site: C.site }); } catch (e2) {}

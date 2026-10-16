@@ -48,7 +48,7 @@
     var t = p.minutes != null ? '<p class="sa-pop-time">About ' + p.minutes + ' minutes from our Mustang office</p>' : '';
     return '<div class="sa-pop"><p class="sa-pop-zip">' + p.zip + '</p><p class="sa-pop-area">' + p.area + '</p>' +
       (p.county ? '<p class="sa-pop-county">' + p.county + '</p>' : '') + t +
-      '<a class="sa-pop-btn" href="contact.html">Book a free visit</a></div>';
+      '<a class="sa-pop-btn" href="index.html#notify">Email me when you open</a></div>';
   }
 
   function select(layer) {
@@ -147,7 +147,7 @@
         if (layer) {
           var p = layer.feature.properties;
           out.classList.add('yes');
-          out.innerHTML = '<b>Yes, we serve ' + z + '.</b> ' + p.area + (p.minutes != null ? ', about ' + p.minutes + ' minutes from our office.' : '.') + ' <a href="contact.html">Book a free visit</a>';
+          out.innerHTML = '<b>Yes, we serve ' + z + '.</b> ' + p.area + (p.minutes != null ? ', about ' + p.minutes + ' minutes from our office.' : '.') + ' We open once we're licensed. <a href="index.html#notify">Get an email when we open</a>';
           map.fitBounds(layer.getBounds(), { padding: [60, 60], maxZoom: 13 });
           select(layer);
           layer.openPopup(layer.getBounds().getCenter());

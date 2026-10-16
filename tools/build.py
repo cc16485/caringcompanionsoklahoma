@@ -18,8 +18,10 @@ GUIDE_PRICING_LINE = '<p>Regular companion care is paid privately; we don\'t bil
 GUIDE_CHECKBOX = '      <label><input type="checkbox" name="interests" value="guide"> Medicare GUIDE respite</label>\n'
 
 CONFIG = {
-    "PREVIEW": False,                    # live since 2026-10-16 (licensed; opening June 2027)
-    "OPENING": "June 2027",             # licensed; visits start then
+    "PREVIEW": False,                    # live since 2026-10-16
+    "LICENSED": False,                   # 2026-10-16: license application in progress, NOT open. Flip when OSDH issues it.
+    "OPENING": "June 2027",             # planned opening (shown as "plan to open")
+    "CAREGIVER_PAY": "$20 an hour",     # her number 2026-10-16
     "GUIDE": True,                       # Oklahoma GUIDE coverage confirmed 2026-10-16
     "DOMAIN": "https://caringcompanionsoklahoma.com",
     "PHONE": "(405) 500-1758",
@@ -59,6 +61,9 @@ def addr():
     return f'{v("STREET", "Office street address")}<br>{city}' if CONFIG["PREVIEW"] else city
 
 def license_line():
+    if not CONFIG["LICENSED"]:
+        return ("Not open yet. Our application for an Oklahoma State Department of Health Sitter or Companion "
+                "Service license is in progress. We don't provide services until the license is issued.")
     base = "Licensed by the Oklahoma State Department of Health as a Sitter or Companion Service"
     if CONFIG.get("LICENSE_NO"):
         return f'{base}, license {html.escape(CONFIG["LICENSE_NO"])}.'
@@ -150,7 +155,10 @@ def head(page, title, desc):
 '''
 
 def header(page):
-    bar = (f'<div class="open-bar">Opening in Mustang in {CONFIG["OPENING"]}. <a href="join.html">Join the opening list</a><span class="hide-sm">, <button type="button" data-app-preview>see how booking will work</button>,</span> or <a href="careers.html">apply to join our team</a>.</div>\n')
+    bar = (f'<div class="open-bar"><b>We\'re not open yet.</b> We\'re getting licensed and plan to open in Mustang in {CONFIG["OPENING"]}. '
+           f'<a href="index.html#notify">Families: get an email when we open</a><span class="hide-sm"> &middot; '
+           f'<a href="careers.html#notify">Caregivers: {CONFIG["CAREGIVER_PAY"]}, get an email to apply</a> &middot; '
+           f'<button type="button" data-app-preview>See how booking will work</button></span></div>\n')
     bar += ('<div class="preview-bar"><b>Preview only.</b> Not yet published. '
            'Highlighted items are still to be filled in.</div>\n') if CONFIG["PREVIEW"] else ""
     current = ' aria-current="page"'
@@ -167,7 +175,7 @@ def header(page):
         else:
             href, label = item
             parts.append(f'<a class="nav-top" href="{href}"{current if href == page else ""}>{label}</a>')
-    parts.append(f'<a class="nav-top nav-hiring" href="careers.html"{current if page == "careers.html" else ""}>We\'re hiring</a>')
+    parts.append(f'<a class="nav-top nav-hiring" href="careers.html"{current if page == "careers.html" else ""}>Jobs: {CONFIG["CAREGIVER_PAY"].replace(" an hour", "/hr")}</a>')
     links = "\n    ".join(parts)
     return f'''{bar}<header class="site-header">
   <div class="header-inner">
@@ -244,7 +252,7 @@ def footer():
 '''
 
 def cta_band(title="Be one of our first families.",
-             text=f"We open in Mustang in {CONFIG['OPENING']}. Join the opening list and we'll be in touch as opening gets closer, or take a look at how booking will work."):
+             text=f"We're not open yet. We're getting licensed and plan to open in Mustang in {CONFIG['OPENING']}. Join the list and we'll email you when we open, or take a look at how booking will work."):
     return f'''<section class="section tight"><div class="shell">
   <div class="cta-band">
     <h2>{title}</h2>
@@ -292,12 +300,12 @@ def page_index():
         for i, t, d in SERVICES[:6])
     return f'''<section class="hero"><div class="shell hero-grid">
   <div>
-    <p class="kicker">Weekday companion care in Mustang, Oklahoma <span class="open-chip">Opening {CONFIG["OPENING"]}</span></p>
+    <p class="kicker">Weekday companion care in Mustang, Oklahoma <span class="open-chip">Not open yet</span></p>
     <h1>While you're at work, they're not alone.</h1>
     <p class="lede">A regular companion for Mom or Dad, Monday to Friday between 8 and 6. Good company, a hot lunch, the errands done and a ride to the doctor, so they stay independent longer and the workday stops being the part you worry about.</p>
     <div class="btn-row">
-      <a class="btn" href="join.html">{icon("i-calendar", "")} Join the opening list</a>
-      <a class="btn btn-outline" href="{phone_href()}">{icon("i-phone", "")} Call {v("PHONE", "(405) phone")}</a>
+      <a class="btn" href="#notify">{icon("i-mail", "")} Email me when you open</a>
+      <button type="button" class="btn btn-outline" data-app-preview>{icon("i-mobile", "")} See how booking works</button>
     </div>
     <ul class="trust-row">
       <li>{icon("i-clock", "")} Monday to Friday, 8am to 6pm</li>
@@ -306,6 +314,37 @@ def page_index():
     </ul>
   </div>
   <div class="hero-img"><picture><source srcset="assets/photos/hero-caregiver.webp" type="image/webp"><img src="assets/photos/hero-caregiver.jpg" alt="A caregiver and an older woman holding hands and laughing on a sofa" width="1100" height="733" fetchpriority="high"></picture></div>
+</div></section>
+
+<section class="section notify-sec" id="notify"><div class="shell">
+  <div class="notify-head">
+    <p class="kicker">Coming to Mustang</p>
+    <h2>We're not open yet. We're getting licensed.</h2>
+    <p class="lede">Our application for an Oklahoma companion service license is in progress, and we plan to open in {CONFIG["OPENING"]}. Until then we can't book visits, but you can get an email the day we're ready.</p>
+  </div>
+  <div class="grid grid-2 notify-grid">
+    <div class="card notify-card">
+      {icon("i-family")}<h3>Families</h3>
+      <p>Get one email when we open, so you can book the first visits.</p>
+      {family_notify()}
+    </div>
+    <div class="card notify-card">
+      {icon("i-heart-honey")}<h3>Caregivers <span class="pay-chip">{CONFIG["CAREGIVER_PAY"]}</span></h3>
+      <p>We're paying companion caregivers {CONFIG["CAREGIVER_PAY"]}. Weekdays, daytime, no nights or weekends. Get an email with the application when hiring opens. <a href="careers.html">About the job</a></p>
+      {caregiver_notify()}
+    </div>
+  </div>
+  <div class="card how-book">
+    <h3>How booking will work, step by step</h3>
+    <ol class="how-steps">
+      <li><b>Pick a day</b><span>Monday to Friday</span></li>
+      <li><b>Pick a time</b><span>between 8am and 6pm</span></li>
+      <li><b>Choose what to do</b><span>lunch, outings, exercise</span></li>
+      <li><b>Pick your caregiver</b><span>see their profile first</span></li>
+      <li><b>Review and book</b><span>see the cost before you confirm</span></li>
+    </ol>
+    <button type="button" class="btn" data-app-preview>{icon("i-mobile", "")} Try the booking app</button>
+  </div>
 </div></section>
 
 <section class="section" id="good-day-club"><div class="shell">
@@ -363,7 +402,7 @@ def page_index():
 <section class="section"><div class="shell">
   <p class="kicker">Honest from the first call</p>
   <h2>Companion care, not personal care.</h2>
-  <p class="lede">Our Oklahoma license is for companion services, so it's important you know exactly what that covers before you call.</p>
+  <p class="lede">The Oklahoma license we're applying for is for companion services, so it's important you know exactly what that covers before you call.</p>
   <div class="boundary" style="margin-top:26px">
     <div><h3>What our caregivers do</h3><ul class="checks">{"".join(f"<li>{t}</li>" for _, t, _ in SERVICES)}</ul></div>
     <div><h3>What they don't do</h3><ul class="nots">{"".join(f"<li>{t}</li>" for t in NOT_DONE)}</ul>
@@ -375,7 +414,7 @@ def page_index():
   <p class="kicker">Getting started</p>
   <h2>Four steps from first call to first visit.</h2>
   <ol class="steps" style="margin-top:26px">
-    <li><h3>Call or book online</h3><p>Tell us what's going on. We'll ask a few questions and find a time to come out. Visits begin when we open in {CONFIG['OPENING']}.</p></li>
+    <li><h3>Call or book online</h3><p>Tell us what's going on. We'll ask a few questions and find a time to come out. We're not open yet: visits begin once we're licensed, planned for {CONFIG['OPENING']}.</p></li>
     <li><h3>Free visit at home</h3><p>We meet your loved one, see the home, and learn their routines and what matters to them.</p></li>
     <li><h3>A written plan</h3><p>Together we write down the help, the days and the hours. We review it with you at least every six months.</p></li>
     <li><h3>Care begins</h3><p>Your caregiver arrives knowing the plan. You can call the office any weekday with questions or changes.</p></li>
@@ -424,7 +463,7 @@ def page_services():
     <div>
       <p class="kicker">Good to know</p>
       <h2>What companion care doesn't include.</h2>
-      <p>Our license from the Oklahoma State Department of Health is for companion services. That means our caregivers don't give hands-on help with the body. They will not help with:</p>
+      <p>The license we're applying for from the Oklahoma State Department of Health is for companion services. That means our caregivers don't give hands-on help with the body. They will not help with:</p>
       <ul class="nots">{"".join(f"<li>{t}</li>" for t in NOT_DONE)}</ul>
       <p>If those needs come up, we'll tell you honestly and talk with you about what kind of care would fit.</p>
     </div>
@@ -616,7 +655,7 @@ def page_about():
     <p class="kicker">Our caregivers</p>
     <h2>More than a job. A calling.</h2>
     <p>Our caregivers come from all walks of life, united by one mission: to help older adults live with dignity, comfort and joy at home. We look for compassion, kindness and patience, and we follow Oklahoma's licensing requirements for companion services, including a fingerprint background check for every caregiver.</p>
-    <p><a href="careers.html">We're hiring in Mustang</a></p>
+    <p><a href="careers.html">Caregiver jobs in Mustang, {CONFIG["CAREGIVER_PAY"]}</a></p>
   </div>
   <div class="card">
     <h3>How we match</h3>
@@ -654,6 +693,29 @@ def page_about():
 
 {cta_band()}'''
 
+def notify_form(kind, button, ok, note):
+    interest = "email-when-hiring" if kind == "caregiver" else "email-when-open"
+    return f'''<form class="form join-form notify-form" data-join data-need-email data-ok="{html.escape(ok)}" novalidate>
+  <input type="radio" name="kind" value="{kind}" checked hidden>
+  <input type="hidden" name="interests" value="{interest}">
+  <div class="join-row"><label>Your name<input name="name" autocomplete="name" required maxlength="120"></label>
+  <label>Email<input name="email" type="email" autocomplete="email" required maxlength="200"></label></div>
+  <label class="join-consent"><input type="checkbox" name="may_contact" checked> {note}</label>
+  <label class="hp-field" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
+  <button class="btn" type="submit">{button}</button>
+  <p class="join-status" role="status" aria-live="polite"></p>
+</form>'''
+
+def family_notify():
+    return notify_form("family", "Email me when you open",
+                       "Thank you! We'll email you as soon as we're open and taking visits.",
+                       "Email me when Caring Companions Oklahoma opens. Nothing else, no spam.")
+
+def caregiver_notify():
+    return notify_form("caregiver", "Email me when hiring opens",
+                       "Thank you! We'll email you the application as soon as hiring opens.",
+                       "Email me the application when hiring opens.")
+
 def apply_form():
     return '''<form class="form card join-form" data-join novalidate>
   <input type="radio" name="kind" value="caregiver" checked hidden>
@@ -668,7 +730,7 @@ def apply_form():
     <label><input type="checkbox" name="interests" value="drives"> I have a driver's license, a car and auto insurance</label>
     <label><input type="checkbox" name="interests" value="cna-or-hha"> I have a CNA, HHA or similar certificate</label>
   </fieldset>
-  <label>When could you start?<select name="timing"><option value="">Choose one</option><option>Early 2027</option><option>Spring 2027</option><option>When you open in June 2027</option></select></label>
+  <label>When could you start?<select name="timing"><option value="">Choose one</option><option>Early 2027</option><option>Spring 2027</option><option>When you open</option></select></label>
   <label>Why would you like to be a companion caregiver? <span class="og-opt">(optional)</span><textarea name="message" maxlength="2000"></textarea></label>
   <label class="join-consent"><input type="checkbox" name="may_contact" checked> It's OK to contact me about working with Caring Companions Oklahoma.</label>
   <label class="hp-field" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
@@ -681,7 +743,7 @@ def job_schema():
     job = {
         "@context": "https://schema.org", "@type": "JobPosting",
         "title": "Companion Caregiver",
-        "description": "<p>Caring Companions Oklahoma is hiring companion caregivers in Mustang, Oklahoma ahead of our June 2027 opening. Spend weekday daytime hours with older adults: conversation, games and walks, light housekeeping, meal preparation, errands, rides to appointments, a simple seated exercise routine and medication reminders. No nights, no weekends, and no hands-on personal care. Every caregiver passes a fingerprint background check through Oklahoma's OKSCREEN program.</p>",
+        "description": "<p>Caring Companions Oklahoma will hire companion caregivers in Mustang, Oklahoma ahead of our June 2027 opening. Spend weekday daytime hours with older adults: conversation, games and walks, light housekeeping, meal preparation, errands, rides to appointments, a simple seated exercise routine and medication reminders. No nights, no weekends, and no hands-on personal care. Every caregiver passes a fingerprint background check through Oklahoma's OKSCREEN program.</p>",
         "datePosted": "2026-10-16", "validThrough": "2027-06-30T23:59",
         "hiringOrganization": {"@type": "Organization", "name": "Caring Companions Oklahoma", "sameAs": CONFIG["DOMAIN"], "logo": CONFIG["DOMAIN"] + "/assets/cc-logo.png"},
         "jobLocation": {"@type": "Place", "address": {"@type": "PostalAddress", "addressLocality": "Mustang", "addressRegion": "OK", "postalCode": "73064", "addressCountry": "US"}},
@@ -690,16 +752,17 @@ def job_schema():
     return '<script type="application/ld+json">' + json.dumps(job) + '</script>'
 
 def page_careers():
-    return f'''{job_schema()}
-<section class="page-hero"><div class="shell">
-  <p class="kicker">Careers <span class="open-chip">Now hiring</span></p>
-  <h1>Now hiring companion caregivers in Mustang.</h1>
-  <p class="lede">We're licensed and building our Mustang team ahead of our {CONFIG["OPENING"]} opening. Daytime weekday hours, no nights, no weekends, and work that matters: keeping someone company and helping them stay at home.</p>
-  <div class="btn-row" style="margin-top:18px"><a class="btn" href="#apply">Apply now</a><a class="btn btn-outline" href="{phone_href()}">Call {v("PHONE", "(405) phone")}</a></div>
+    # No JobPosting schema until hiring actually opens (Google only allows open jobs).
+    return f'''<section class="page-hero"><div class="shell">
+  <p class="kicker">Careers <span class="open-chip">Hiring soon</span></p>
+  <h1>Companion caregiver jobs are coming to Mustang. {CONFIG["CAREGIVER_PAY"][0].upper() + CONFIG["CAREGIVER_PAY"][1:]}.</h1>
+  <p class="lede">We're not hiring yet. We're getting licensed and plan to open in {CONFIG["OPENING"]}. We'll pay companion caregivers {CONFIG["CAREGIVER_PAY"]}, daytime weekday hours, no nights, no weekends. Leave your email and we'll send you the application as soon as hiring opens.</p>
+  <div class="btn-row" style="margin-top:18px"><a class="btn" href="#notify">{icon("i-mail", "")} Email me when hiring opens</a></div>
 </div></section>
 
 <section class="section"><div class="shell">
   <div class="grid grid-3">
+    <div class="card">{icon("i-money")}<h3>{CONFIG["CAREGIVER_PAY"][0].upper() + CONFIG["CAREGIVER_PAY"][1:]}</h3><p>What we'll pay companion caregivers in Mustang.</p></div>
     <div class="card">{icon("i-sun")}<h3>Daytime, weekdays</h3><p>Monday to Friday, between 8am and 6pm. Evenings and weekends are yours.</p></div>
     <div class="card">{icon("i-heart-honey")}<h3>Work that matters</h3><p>You're the reason someone's week has something to look forward to.</p></div>
     <div class="card">{icon("i-handshake")}<h3>A local team</h3><p>You're supervised from our Mustang office, with people who know you by name.</p></div>
@@ -725,12 +788,12 @@ def page_careers():
       <li>A valid driver's license and auto insurance, if you'll drive clients</li>
     </ul>
     <h3>What happens next</h3>
-    <p>We read every application. If it looks like a fit, we'll call you to set up an interview in Mustang.</p>
+    <p>When hiring opens, we'll email you the application. It takes about two minutes, no resume needed. If it looks like a fit, we'll call you to set up an interview in Mustang.</p>
   </div>
-  <div>
-    <h2>Apply now</h2>
-    <p>It takes about two minutes. No resume needed.</p>
-    {apply_form()}
+  <div id="notify" class="card notify-card">
+    {icon("i-mail")}<h2>Get an email when hiring opens</h2>
+    <p>Pay is {CONFIG["CAREGIVER_PAY"]}. Add your name and email, and we'll send you the application the day we start hiring.</p>
+    {caregiver_notify()}
   </div>
 </div></section>
 '''
@@ -739,7 +802,7 @@ def page_contact():
     return f'''<section class="page-hero"><div class="shell">
   <p class="kicker">Contact</p>
   <h1>Talk to us.</h1>
-  <p class="lede">We open in Mustang in {CONFIG["OPENING"]}. Add your name to the opening list, or reach us any weekday.</p>
+  <p class="lede">We're not open yet. We're getting licensed and plan to open in Mustang in {CONFIG["OPENING"]}. Add your name to the list, or reach us any weekday.</p>
 </div></section>
 
 <section class="section"><div class="shell grid grid-2" style="align-items:start">
@@ -799,7 +862,7 @@ def page_join():
     return f'''<section class="page-hero"><div class="shell">
   <p class="kicker">Opening {CONFIG["OPENING"]}</p>
   <h1>Join the opening list.</h1>
-  <p class="lede">We're licensed and getting ready to open in Mustang. Families, future caregivers and referral partners: add your name and we'll be in touch as opening gets closer.</p>
+  <p class="lede">We're not open yet. We're getting licensed and plan to open in Mustang in {CONFIG["OPENING"]}. Families, future caregivers and referral partners: add your name and we'll be in touch as opening gets closer.</p>
 </div></section>
 
 <section class="section"><div class="shell grid grid-2" style="align-items:start">
@@ -1167,7 +1230,7 @@ def make_town_page(t):
     def page():
         return f'''{town_schema(name, slug)}
 <section class="page-hero"><div class="shell">
-  <p class="kicker">Companion care in {name}, Oklahoma <span class="open-chip">Opening {CONFIG["OPENING"]}</span></p>
+  <p class="kicker">Companion care in {name}, Oklahoma <span class="open-chip">Not open yet</span></p>
   <h1>Weekday companion care in {name}.</h1>
   <p class="lede">{opener} A regular companion for Mom or Dad, Monday to Friday between 8 and 6: good company, a hot lunch, errands done and a ride to the doctor.</p>
   <div class="btn-row" style="margin-top:18px"><a class="btn" href="join.html">Join the opening list</a><a class="btn btn-outline" href="{phone_href()}">Call {v("PHONE", "(405) phone")}</a></div>
@@ -1204,7 +1267,7 @@ def make_town_page(t):
   <h2>Questions families in {name} ask</h2>
   <div class="faqs">
     <details class="faq"><summary>Do you serve all of {name}?</summary><p>We serve ZIP code{"s" if len(zips) > 1 else ""} {zip_list}. If you're not sure about your address, call us at {v("PHONE", "(405) phone")} or check your ZIP on our <a href="service-area.html">service area map</a>.</p></details>
-    <details class="faq"><summary>When can visits start?</summary><p>We're licensed and open in Mustang in {CONFIG["OPENING"]}. <a href="join.html">Join the opening list</a> and we'll be in touch as opening gets closer.</p></details>
+    <details class="faq"><summary>When can visits start?</summary><p>We're not open yet. We're getting licensed and plan to open in Mustang in {CONFIG["OPENING"]}. <a href="join.html">Join the opening list</a> and we'll be in touch as opening gets closer.</p></details>
     <details class="faq"><summary>Do your caregivers help with bathing or dressing?</summary><p>No. Our Oklahoma license is for companion services, so our caregivers don't give hands-on personal care. If your loved one needs that, we'll tell you honestly at the first visit.</p></details>
     <details class="faq"><summary>Does Medicare pay for any of this?</summary><p>Regular companion care is paid privately. For families living with dementia, Medicare's <a href="medicare-guide.html">GUIDE program</a> may cover respite visits.</p></details>
   </div>
@@ -1241,8 +1304,8 @@ PAGES = [
      "Medicare's GUIDE program may pay for dementia respite visits for families in Mustang and west Oklahoma City. See who qualifies.", page_guide)] if CONFIG["GUIDE"] else []) + [
     ("about.html", "About Us | Caring Companions Oklahoma",
      "A family-owned company caring for families since 2017, now serving Mustang, Oklahoma with companion care.", page_about),
-    ("careers.html", "Now Hiring: Companion Caregiver Jobs in Mustang, OK | Caring Companions",
-     "Now hiring companion caregivers in Mustang, Oklahoma. Weekday daytime hours, no nights, no weekends. Apply in two minutes, no resume needed.", page_careers),
+    ("careers.html", "Companion Caregiver Jobs in Mustang, OK, $20/hr | Caring Companions",
+     "Companion caregiver jobs coming to Mustang, Oklahoma at $20 an hour. Weekday daytime hours, no nights, no weekends. Get an email with the application when hiring opens.", page_careers),
     ("contact.html", "Contact Us | Caring Companions Oklahoma",
      "Reach Caring Companions in Mustang, OK, or join our opening list. Weekday companion care opening June 2027.", page_contact),
     ("join.html", "Join Our Opening List | Caring Companions Oklahoma",
