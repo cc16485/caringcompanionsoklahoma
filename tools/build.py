@@ -22,6 +22,8 @@ CONFIG = {
     "LICENSED": False,                   # 2026-10-16: license application in progress, NOT open. Flip when OSDH issues it.
     "OPENING": "June 2027",             # planned opening (shown as "plan to open")
     "CAREGIVER_PAY": "$20 an hour",     # her number 2026-10-16
+    "HIRING_OPEN": False,               # 806: apply.html (the Companion application, saves into the Hub) is built but unlisted
+                                        #   (noindex, not in the sitemap, not linked) until she says hiring is open
     "GUIDE": True,                       # Oklahoma GUIDE coverage confirmed 2026-10-16
     "DOMAIN": "https://caringcompanionsoklahoma.com",
     "PHONE": "(405) 500-1758",
@@ -125,7 +127,7 @@ def schema(page):
     return '<script type="application/ld+json">' + json.dumps(data) + '</script>\n'
 
 def head(page, title, desc):
-    robots = '<meta name="robots" content="noindex, nofollow">\n' if CONFIG["PREVIEW"] else ""
+    robots = '<meta name="robots" content="noindex, nofollow">\n' if CONFIG["PREVIEW"] or (page == "apply.html" and not CONFIG["HIRING_OPEN"]) else ""
     canon = CONFIG["DOMAIN"] + "/" + ("" if page == "index.html" else page.replace(".html", ""))
     return f'''<!DOCTYPE html>
 <html lang="en">
@@ -752,6 +754,61 @@ def job_schema():
     }
     return '<script type="application/ld+json">' + json.dumps(job) + '</script>'
 
+def companion_application():
+    """806 (2026-10-16): the Companion application. Three short screens that save into the Hub (assets/apply.js), not the
+    opening list. Same questions as the plan she approved: no personal care, CNA, Medicaid, CDS or FCSR questions."""
+    def yn(name, q):
+        return (f'<fieldset class="apply-q"><legend>{q}</legend><div class="apply-yn">'
+                f'<label><input type="radio" name="{name}" value="yes"> Yes</label><label><input type="radio" name="{name}" value="no"> No</label></div></fieldset>')
+    def pick(name, q, opts):
+        return (f'<fieldset class="apply-q"><legend>{q}</legend><div class="apply-opts">'
+                + "".join(f'<label><input type="radio" name="{name}" value="{html.escape(o)}"> {html.escape(o)}</label>' for o in opts) + '</div></fieldset>')
+    cfg = json.dumps({"phone": CONFIG.get("PHONE") or "", "towns": {z: a for z, a, _ in ZIPS}})
+    return f'''<form class="form card join-form apply-form" data-apply novalidate>
+  <p class="apply-progress" aria-live="polite"></p>
+  <div data-step="1">
+    <h3>About you</h3>
+    <div class="join-row"><label>First name<input name="first_name" autocomplete="given-name" required maxlength="80"></label>
+    <label>Last name<input name="last_name" autocomplete="family-name" required maxlength="80"></label></div>
+    <div class="join-row"><label>Phone<input name="phone" type="tel" autocomplete="tel" required maxlength="40"></label>
+    <label>Email <span class="og-opt">(optional)</span><input name="email" type="email" autocomplete="email" maxlength="200"></label></div>
+    <label>Your ZIP code<input name="zip" inputmode="numeric" autocomplete="postal-code" required maxlength="5"></label>
+    <label class="join-consent"><input type="checkbox" name="sms"> Text me about this application and other openings near me. Message and data rates may apply, and you can stop any time by replying STOP.</label>
+    <label class="hp-field" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
+    <button class="btn" type="button" data-go="1">Next</button>
+  </div>
+  <div data-step="2" hidden>
+    <h3>The job</h3>
+    {yn("age_ok", "Are you 18 or older?")}
+    {yn("work_auth", "Are you legally allowed to work in the United States?")}
+    {yn("okscreen", "Will you agree to an OKSCREEN fingerprint background check?")}
+    {pick("weekdays", "Which weekday hours between 8am and 6pm can you work?", ["All weekdays", "Some weekdays", "No weekday hours"])}
+    {yn("drive", "Do you have a driver's license, a car and auto insurance to drive clients?")}
+    <label>Experience with older adults<select name="experience_years"><option value="">Choose one</option><option>None yet</option><option>Less than 1 year</option><option>1 to 3 years</option><option>More than 3 years</option></select></label>
+    <label>When can you start?<select name="start"><option value="">Choose one</option><option>Now, for training</option><option>Spring 2027</option><option>When you open in June 2027</option></select></label>
+    <div class="btn-row"><button class="btn" type="button" data-go="2">Next</button><button class="btn btn-outline" type="button" data-go="back2">Back</button></div>
+  </div>
+  <div data-step="3" hidden>
+    <h3>Anything else</h3>
+    <label>What do you enjoy about spending time with older adults? <span class="og-opt">(optional)</span><textarea name="enjoy" maxlength="2000"></textarea></label>
+    <label>Anything we should know? <span class="og-opt">(optional)</span><textarea name="anything_else" maxlength="2000"></textarea></label>
+    <label>How did you hear about us? <span class="og-opt">(optional)</span><select name="referral_source"><option value="">Choose one</option><option>Google</option><option>Indeed</option><option>Facebook</option><option>A friend or family member</option><option>Somewhere else</option></select></label>
+    <div class="btn-row"><button class="btn" type="button" data-go="3">Send my application</button><button class="btn btn-outline" type="button" data-go="back3">Back</button></div>
+  </div>
+  <div data-step="done" hidden>
+    <h3>Thank you. We have your application.</h3>
+    <p>We read every application. If it looks like a fit, we will call you from {v("PHONE", "(405) phone")} to set up an interview.</p>
+  </div>
+  <div data-step="stop" hidden>
+    <h3>Thank you for applying.</h3>
+    <p data-stop-why></p><p data-stop-next></p>
+  </div>
+  <p class="join-status" role="status" aria-live="polite"></p>
+  <p class="form-note">We only use your details to contact you about working with us. We never sell or share them.</p>
+</form>
+<script>window.APPLY_CONFIG = {cfg};</script>
+<script src="assets/apply.js" defer></script>'''
+
 def page_careers():
     # No JobPosting schema until hiring actually opens (Google only allows open jobs).
     return f'''<section class="page-hero"><div class="shell">
@@ -796,6 +853,19 @@ def page_careers():
     <p>Pay is {CONFIG["CAREGIVER_PAY"]}. Add your name and email, and we'll send you the application the day we start hiring.</p>
     {caregiver_notify()}
   </div>
+</div></section>
+'''
+
+def page_apply():
+    return f'''<section class="page-hero"><div class="shell">
+  <p class="kicker">Careers <span class="open-chip">{"Now hiring" if CONFIG["HIRING_OPEN"] else "Application"}</span></p>
+  <h1>Apply to be a Companion.</h1>
+  <p class="lede">Weekdays between 8am and 6pm in Mustang and west Oklahoma City. Companion work only, no hands-on personal care. It takes about two minutes, and no resume is needed.</p>
+</div></section>
+
+<section class="section" id="apply"><div class="shell" style="max-width:720px">
+  {companion_application()}
+  <p class="form-note" style="margin-top:14px">Rather talk? Call {v("PHONE", "(405) phone")}, Monday to Friday, 8am to 6pm. <a href="careers.html">About the job</a></p>
 </div></section>
 '''
 
@@ -1358,6 +1428,8 @@ PAGES = [
      "A family-owned company caring for families since 2017, now serving Mustang, Oklahoma with companion care.", page_about),
     ("careers.html", "Companion Caregiver Jobs in Mustang, OK, $20/hr | Caring Companions",
      "Companion caregiver jobs coming to Mustang, Oklahoma at $20 an hour. Weekday daytime hours, no nights, no weekends. Get an email with the application when hiring opens.", page_careers),
+    ("apply.html", "Apply: Companion Caregiver in Mustang, OK | Caring Companions",
+     "Apply to be a Companion with Caring Companions Oklahoma. Weekdays between 8am and 6pm, no nights, no weekends. About two minutes, no resume needed.", page_apply),
     ("contact.html", "Contact Us | Caring Companions Oklahoma",
      "Reach Caring Companions in Mustang, OK, or join our opening list. Weekday companion care opening June 2027.", page_contact),
     ("join.html", "Join Our Opening List | Caring Companions Oklahoma",
@@ -1379,7 +1451,7 @@ def build():
     open(os.path.join(ROOT, "robots.txt"), "w").write(robots)
     urls = "".join(
         f"<url><loc>{CONFIG['DOMAIN']}/{'' if p == 'index.html' else p.replace('.html', '')}</loc></url>"
-        for p, *_ in PAGES + TOWN_PAGES)
+        for p, *_ in PAGES + TOWN_PAGES if p != "apply.html" or CONFIG["HIRING_OPEN"])
     open(os.path.join(ROOT, "sitemap.xml"), "w").write(
         f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n')
 
