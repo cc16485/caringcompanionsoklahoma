@@ -223,6 +223,7 @@ def footer():
         </ul>
       </div>
     </div>
+    <p class="footer-towns">Companion care in <a href="companion-care-mustang-ok.html">Mustang</a> &middot; <a href="companion-care-yukon-ok.html">Yukon</a> &middot; <a href="companion-care-tuttle-ok.html">Tuttle</a> &middot; <a href="companion-care-el-reno-ok.html">El Reno</a> &middot; <a href="companion-care-piedmont-ok.html">Piedmont</a> &middot; <a href="companion-care-bethany-ok.html">Bethany</a> &middot; <a href="companion-care-nichols-hills-ok.html">Nichols Hills</a> &middot; <a href="companion-care-oklahoma-city-ok.html">Oklahoma City</a></p>
     <div class="footer-legal">
       <span>{license_line()}</span>
       <span>We provide companion care only. Our caregivers do not provide hands-on personal care or medical care.</span>
@@ -512,7 +513,9 @@ ZIPS = [
 ]
 
 def page_service_area():
-    towns = "".join(f"<li>{t}</li>" for t in TOWNS)
+    slugs = {"Mustang": "mustang", "Yukon": "yukon", "Tuttle": "tuttle", "El Reno": "el-reno", "Piedmont": "piedmont", "Bethany": "bethany",
+             "Nichols Hills": "nichols-hills", "West Oklahoma City": "oklahoma-city", "Southwest Oklahoma City": "oklahoma-city", "Northwest Oklahoma City": "oklahoma-city"}
+    towns = "".join(f'<li><a href="companion-care-{slugs[t]}-ok.html">{t}</a></li>' if t in slugs else f"<li>{t}</li>" for t in TOWNS)
     return f'''<section class="page-hero"><div class="shell">
   <p class="kicker">Service area</p>
   <h1>Companion care in Mustang and nearby towns.</h1>
@@ -1099,6 +1102,126 @@ def page_404():
   <div class="btn-row" style="margin-top:18px"><a class="btn" href="/">Home</a><a class="btn btn-outline" href="/services.html">Services</a><a class="btn btn-outline" href="/join.html">Join the opening list</a></div>
 </div></section>'''
 
+# ---------- Town landing pages (local search) ----------
+import math as _m
+_OUT = json.load(open(os.path.join(ROOT, "assets", "outings.json")))["items"]
+TOWN_INFO = [
+    # slug, name, center, zips, county, minutes from the Mustang office, opening line
+    ("mustang", "Mustang", (35.3842, -97.7245), ["73064"], "Canadian County", 2,
+     "Mustang is home: our Oklahoma office is here, and every visit is planned from just down the road."),
+    ("yukon", "Yukon", (35.5067, -97.7625), ["73099"], "Canadian County", 13,
+     "Yukon families are about 13 minutes from our Mustang office, close enough for a caregiver who knows the town."),
+    ("tuttle", "Tuttle", (35.2909, -97.8120), ["73089"], "Grady County", 22,
+     "Tuttle is about 22 minutes from our Mustang office, and part of our everyday service area."),
+    ("el-reno", "El Reno", (35.5323, -97.9550), ["73036"], "Canadian County", 28,
+     "El Reno is about 28 minutes from our Mustang office, with a downtown full of history worth getting out to see."),
+    ("piedmont", "Piedmont", (35.6420, -97.7464), ["73078"], "Canadian County", 37,
+     "Piedmont is at the north edge of our service area, about 37 minutes from our Mustang office."),
+    ("bethany", "Bethany", (35.5187, -97.6323), ["73008"], "Oklahoma County", 20,
+     "Bethany is about 20 minutes from our Mustang office, with a library, parks and a YMCA all close to home."),
+    ("nichols-hills", "Nichols Hills", (35.5509, -97.5489), ["73116"], "Oklahoma County", 29,
+     "Nichols Hills is about 29 minutes from our Mustang office, near Lake Hefner, Will Rogers Park and some of the area's best libraries."),
+    ("oklahoma-city", "Oklahoma City", (35.4580, -97.6480), ["73127", "73128", "73169", "73179", "73159", "73170", "73173", "73132", "73162", "73142"], "Oklahoma and Cleveland counties", None,
+     "We serve west, southwest and northwest Oklahoma City, most of it within 25 minutes of our Mustang office."),
+]
+CAT_LABEL = {"senior-center": "Senior center", "library": "Library", "park-garden": "Park or garden", "museum-history": "Museum and history",
+             "arts-music-classes": "Arts and music", "exercise": "Staying active", "events-seasonal": "Event", "everyday": "Everyday outing", "volunteering": "Giving back"}
+
+def _mi(a, b):
+    t = _m.pi / 180; dl = (b[0] - a[0]) * t; do = (b[1] - a[1]) * t
+    h = _m.sin(dl / 2) ** 2 + _m.cos(a[0] * t) * _m.cos(b[0] * t) * _m.sin(do / 2) ** 2
+    return 2 * 3958.8 * _m.asin(_m.sqrt(h))
+
+def town_places(center, n=6):
+    pool = [(_mi(center, (x["lat"], x["lon"])), x) for x in _OUT if x.get("lat") and not x.get("family") and x["category"] != "events-seasonal"]
+    pool.sort(key=lambda z: z[0])
+    picked, seen = [], set()
+    for d, x in pool:                      # variety first: one per category
+        if x["category"] in seen: continue
+        seen.add(x["category"]); picked.append((d, x))
+        if len(picked) == n: break
+    for d, x in pool:                      # then fill with the nearest
+        if len(picked) == n: break
+        if (d, x) not in picked: picked.append((d, x))
+    return sorted(picked, key=lambda z: z[0])
+
+def town_schema(name, slug):
+    data = {"@context": "https://schema.org", "@type": "Service", "serviceType": "Companion care for older adults",
+            "name": f"Companion care in {name}, OK", "url": f'{CONFIG["DOMAIN"]}/companion-care-{slug}-ok',
+            "provider": {"@type": "LocalBusiness", "name": "Caring Companions Oklahoma", "url": CONFIG["DOMAIN"] + "/",
+                         "telephone": "+1-405-500-1758", "address": {"@type": "PostalAddress", "addressLocality": "Mustang", "addressRegion": "OK", "postalCode": "73064", "addressCountry": "US"}},
+            "areaServed": {"@type": "City", "name": f"{name}, OK"},
+            "hoursAvailable": {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], "opens": "08:00", "closes": "18:00"}}
+    return '<script type="application/ld+json">' + json.dumps(data) + '</script>'
+
+def make_town_page(t):
+    slug, name, center, zips, county, mins, opener = t
+    places = town_places(center)
+    cards = "".join(
+        f'<a class="card card-link" href="{html.escape(x.get("website") or "outings.html")}" target="_blank" rel="noopener">'
+        f'<p class="kicker" style="margin-bottom:6px">{CAT_LABEL.get(x["category"], "Outing")}</p><h3>{html.escape(x["name"])}</h3>'
+        f'<p>{html.escape(x["town"])}, about {max(1, round(d))} mile{"s" if round(d) != 1 else ""} away</p></a>' for d, x in places)
+    zip_list = ", ".join(zips)
+    others = "".join(f'<li><a href="companion-care-{o[0]}-ok.html">{o[1]}</a></li>' for o in TOWN_INFO if o[0] != slug)
+    time_line = f"about {mins} minutes from our Mustang office" if mins is not None else "within about 25 minutes of our Mustang office"
+    def page():
+        return f'''{town_schema(name, slug)}
+<section class="page-hero"><div class="shell">
+  <p class="kicker">Companion care in {name}, Oklahoma <span class="open-chip">Opening {CONFIG["OPENING"]}</span></p>
+  <h1>Weekday companion care in {name}.</h1>
+  <p class="lede">{opener} A regular companion for Mom or Dad, Monday to Friday between 8 and 6: good company, a hot lunch, errands done and a ride to the doctor.</p>
+  <div class="btn-row" style="margin-top:18px"><a class="btn" href="join.html">Join the opening list</a><a class="btn btn-outline" href="{phone_href()}">Call {v("PHONE", "(405) phone")}</a></div>
+</div></section>
+
+<section class="section"><div class="shell grid grid-2" style="align-items:start">
+  <div>
+    <h2>What we help with in {name}</h2>
+    <ul class="checks">
+      <li>Companionship: conversation, games, hobbies and walks</li>
+      <li>Light housekeeping, laundry and meals cooked at home</li>
+      <li>Errands, groceries and rides to appointments</li>
+      <li>A guided seated exercise routine and medication reminders</li>
+      <li>Respite, so the family caregiver gets a break</li>
+    </ul>
+    <p>All of it is part of <a href="index.html#good-day-club">The Good Day Club</a>, our way of helping older adults stay independent longer. Companion care is $30 an hour, starting with one 4-hour visit a week. <a href="pricing.html">See pricing</a></p>
+  </div>
+  <div class="card">
+    <h3>Serving {name}</h3>
+    <dl class="hours"><dt>ZIP codes</dt><dd>{zip_list}</dd><dt>County</dt><dd>{county}</dd><dt>Distance</dt><dd>{time_line}</dd><dt>Visits</dt><dd>Monday to Friday, 8am to 6pm</dd></dl>
+    <p style="margin:0"><a href="service-area.html">Check your ZIP on our map</a></p>
+  </div>
+</div></section>
+
+<section class="section alt"><div class="shell">
+  <p class="kicker">Good days out near {name}</p>
+  <h2>Places we can go together.</h2>
+  <p class="lede">A visit can include an outing. Here are a few real places close to {name}. Our caregiver drives, stays with them, and brings them home.</p>
+  <div class="grid grid-3" style="margin-top:22px">{cards}</div>
+  <p style="margin-top:18px"><a href="outings.html">See all outing ideas and plan a sample week</a></p>
+</div></section>
+
+<section class="section"><div class="shell" style="max-width:860px">
+  <h2>Questions families in {name} ask</h2>
+  <div class="faqs">
+    <details class="faq"><summary>Do you serve all of {name}?</summary><p>We serve ZIP code{"s" if len(zips) > 1 else ""} {zip_list}. If you're not sure about your address, call us at {v("PHONE", "(405) phone")} or check your ZIP on our <a href="service-area.html">service area map</a>.</p></details>
+    <details class="faq"><summary>When can visits start?</summary><p>We're licensed and open in Mustang in {CONFIG["OPENING"]}. <a href="join.html">Join the opening list</a> and we'll be in touch as opening gets closer.</p></details>
+    <details class="faq"><summary>Do your caregivers help with bathing or dressing?</summary><p>No. Our Oklahoma license is for companion services, so our caregivers don't give hands-on personal care. If your loved one needs that, we'll tell you honestly at the first visit.</p></details>
+    <details class="faq"><summary>Does Medicare pay for any of this?</summary><p>Regular companion care is paid privately. For families living with dementia, Medicare's <a href="medicare-guide.html">GUIDE program</a> may cover respite visits.</p></details>
+  </div>
+</div></section>
+
+<section class="section tight alt"><div class="shell">
+  <h2>Other towns we serve</h2>
+  <ul class="towns town-links">{others}</ul>
+</div></section>
+
+{cta_band()}'''
+    return page
+
+TOWN_PAGES = [(f"companion-care-{t[0]}-ok.html", f"Companion Care in {t[1]}, OK | Caring Companions Oklahoma",
+               f"Weekday companion care for older adults in {t[1]}, Oklahoma: company, meals, errands, rides and seated exercise. $30/hour. Opening June 2027.",
+               make_town_page(t)) for t in TOWN_INFO]
+
 PAGES = [
     ("index.html", "Weekday Companion Care in Mustang, OK | Caring Companions",
      "Weekday companion care in Mustang, OK. The Good Day Club helps older adults stay independent longer: company, meals, gentle exercise, errands and rides to appointments. Monday to Friday, 8 to 6.", page_index),
@@ -1127,7 +1250,7 @@ PAGES = [
 ]
 
 def build():
-    for fname, title, desc, fn in PAGES + [("404.html", "Page Not Found | Caring Companions Oklahoma", "Page not found.", page_404)]:
+    for fname, title, desc, fn in PAGES + TOWN_PAGES + [("404.html", "Page Not Found | Caring Companions Oklahoma", "Page not found.", page_404)]:
         body = fn()
         with open(os.path.join(ROOT, fname), "w") as f:
             f.write(head(fname, title, desc) + header(fname) + body + footer())
@@ -1136,7 +1259,7 @@ def build():
     open(os.path.join(ROOT, "robots.txt"), "w").write(robots)
     urls = "".join(
         f"<url><loc>{CONFIG['DOMAIN']}/{'' if p == 'index.html' else p.replace('.html', '')}</loc></url>"
-        for p, *_ in PAGES)
+        for p, *_ in PAGES + TOWN_PAGES)
     open(os.path.join(ROOT, "sitemap.xml"), "w").write(
         f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n')
 
