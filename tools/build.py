@@ -19,6 +19,8 @@ GUIDE_CHECKBOX = '      <label><input type="checkbox" name="interests" value="gu
 
 CONFIG = {
     "PREVIEW": False,                    # live since 2026-10-16
+    "COMING_SOON": True,                 # 2026-10-16 her call: only a coming-soon page is public until the OSDH license is issued.
+                                        #   License day: set False (and LICENSED True), run build, push. Full site is also saved on branch full-site.
     "LICENSED": False,                   # 2026-10-16: license application in progress, NOT open. Flip when OSDH issues it.
     "OPENING": "June 2027",             # planned opening (shown as "plan to open")
     "CAREGIVER_PAY": "$20 an hour",     # her number 2026-10-16
@@ -1436,7 +1438,120 @@ PAGES = [
      "Caring Companions opens in Mustang, Oklahoma in June 2027. Join the opening list as a family, a future caregiver or a referral partner.", page_join),
 ]
 
+def coming_soon_page():
+    # One honest page: no services, prices or booking while the license is pending (OAC 310:662-8-1).
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Caring Companions Oklahoma | Coming to Mustang</title>
+<meta name="description" content="Caring Companions has cared for families in Southwest Missouri since 2017 and is getting licensed to open an office in Mustang, Oklahoma. Leave your email to hear when we open or when hiring starts.">
+<link rel="canonical" href="{CONFIG["DOMAIN"]}/">
+<meta property="og:title" content="Caring Companions Oklahoma | Coming to Mustang">
+<meta property="og:description" content="We're getting licensed to open an office in Mustang, Oklahoma. Leave your email to hear when we open.">
+<meta property="og:url" content="{CONFIG["DOMAIN"]}/">
+<meta property="og:image" content="{CONFIG["DOMAIN"]}/assets/photos/garden-visit-wide.webp">
+<link rel="icon" href="assets/favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+.cs {{ min-height: 100vh; display: grid; grid-template-rows: auto 1fr auto; background: radial-gradient(1100px 420px at 85% -10%, rgba(143,209,199,.35), transparent 60%), radial-gradient(900px 380px at -10% 110%, rgba(240,166,58,.16), transparent 60%), var(--bg); }}
+.cs-top {{ max-width: var(--shell); width: 100%; margin: 0 auto; padding: 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }}
+.cs-top img {{ height: 46px; width: auto; }}
+.cs-top a.cs-phone {{ font-weight: 700; color: var(--navy); text-decoration: none; }}
+.cs-main {{ max-width: var(--shell); width: 100%; margin: 0 auto; padding: 24px 20px 56px; display: grid; grid-template-columns: 1.05fr .95fr; gap: 44px; align-items: center; }}
+.cs-photo {{ border-radius: 20px; overflow: hidden; aspect-ratio: 5 / 4; box-shadow: 0 18px 40px rgba(13,54,95,.14); background: #FBEFD9; }}
+.cs-photo img {{ width: 100%; height: 100%; object-fit: cover; }}
+.cs h1 {{ font-size: clamp(36px, 5.2vw, 56px); }}
+.cs-cards {{ display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 26px; }}
+.cs-card {{ background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }}
+.cs-card h2 {{ font-size: 21px; margin-bottom: 4px; }}
+.cs-card p {{ font-size: 15px; color: var(--muted); margin-bottom: 12px; }}
+.cs-card .form {{ gap: 10px; }}
+.cs-card .btn {{ width: 100%; }}
+.cs-foot {{ border-top: 1px solid var(--border); padding: 18px 20px 26px; text-align: center; font-size: 14px; color: var(--muted); }}
+.cs-foot a {{ color: var(--honey-text); }}
+@media (max-width: 900px) {{ .cs-main {{ grid-template-columns: 1fr; }} .cs-photo {{ order: -1; aspect-ratio: 16 / 10; }} }}
+@media (max-width: 640px) {{ .cs-cards {{ grid-template-columns: 1fr; }} .cs-top img {{ height: 38px; }} }}
+</style>
+</head>
+<body class="cs">
+<header class="cs-top"><img src="assets/cc-logo.png" alt="Caring Companions" width="800" height="206"><a class="cs-phone" href="{phone_href()}">{v("PHONE", "(405) phone")}</a></header>
+<main class="cs-main">
+  <div>
+    <p class="kicker">Coming to Mustang, Oklahoma</p>
+    <h1>Caring Companions is coming to Mustang.</h1>
+    <p class="lede">We've cared for families across Southwest Missouri since 2017. We're getting licensed to open an office in Mustang, and we plan to open in {CONFIG["OPENING"]}.</p>
+    <div class="cs-cards">
+      <div class="cs-card">
+        <h2>For families</h2>
+        <p>Leave your email and we'll let you know when we open.</p>
+        <form class="form" data-join novalidate>
+          <input type="radio" name="kind" value="family" checked hidden>
+          <label class="sr-only" for="cs-fn">Your name</label><input id="cs-fn" name="name" autocomplete="name" placeholder="Your name" required maxlength="120">
+          <label class="sr-only" for="cs-fe">Email</label><input id="cs-fe" name="email" type="email" autocomplete="email" placeholder="Email" maxlength="200">
+          <label class="sr-only" for="cs-fz">ZIP code</label><input id="cs-fz" name="zip" inputmode="numeric" autocomplete="postal-code" placeholder="ZIP code" maxlength="5">
+          <input type="hidden" name="interests" value="notify-open">
+          <label class="join-consent"><input type="checkbox" name="may_contact" checked> Email me when you open.</label>
+          <label class="hp-field" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
+          <button class="btn" type="submit">Notify me</button>
+          <p class="join-status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+      <div class="cs-card">
+        <h2>For caregivers</h2>
+        <p>We'll be hiring in Mustang at {CONFIG["CAREGIVER_PAY"]}. Leave your email to hear when hiring opens.</p>
+        <form class="form" data-join novalidate>
+          <input type="radio" name="kind" value="caregiver" checked hidden>
+          <label class="sr-only" for="cs-cn">Your name</label><input id="cs-cn" name="name" autocomplete="name" placeholder="Your name" required maxlength="120">
+          <label class="sr-only" for="cs-ce">Email</label><input id="cs-ce" name="email" type="email" autocomplete="email" placeholder="Email" maxlength="200">
+          <label class="sr-only" for="cs-cz">ZIP code</label><input id="cs-cz" name="zip" inputmode="numeric" autocomplete="postal-code" placeholder="ZIP code" maxlength="5">
+          <input type="hidden" name="interests" value="notify-hiring">
+          <label class="join-consent"><input type="checkbox" name="may_contact" checked> Email me when hiring opens.</label>
+          <label class="hp-field" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
+          <button class="btn" type="submit">Notify me</button>
+          <p class="join-status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="cs-photo"><img src="assets/photos/garden-visit-wide.webp" alt="A caregiver and an older woman walking together in a garden" loading="eager"></div>
+</main>
+<footer class="cs-foot">
+  <p>Questions? Call <a href="{phone_href()}">{v("PHONE", "(405) phone")}</a>, Monday to Friday, 8am to 6pm.</p>
+  <p>Our application for an Oklahoma Sitter or Companion Service license is in progress. We don't provide services in Oklahoma until the license is issued.</p>
+  <p>Looking for care in Missouri? Visit <a href="https://mo-care.com/">mo-care.com</a>. &copy; 2026 Caring Companions.</p>
+</footer>
+<script>window.JOIN_CONFIG = {json.dumps({"site": "oklahoma", "fallback": "Please call " + (CONFIG.get("PHONE") or "us") + "."})};</script>
+<script src="assets/join.js" defer></script>
+</body>
+</html>
+"""
+
+def forward_stub():
+    return f"""<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex, nofollow">
+<title>Caring Companions Oklahoma | Coming to Mustang</title>
+<link rel="canonical" href="{CONFIG["DOMAIN"]}/">
+<meta http-equiv="refresh" content="0; url=/"></head>
+<body><p>Caring Companions is coming to Mustang. <a href="/">Continue</a></p></body></html>
+"""
+
 def build():
+    if CONFIG.get("COMING_SOON"):
+        open(os.path.join(ROOT, "index.html"), "w").write(coming_soon_page())
+        open(os.path.join(ROOT, "404.html"), "w").write(coming_soon_page().replace('<link rel="canonical"', '<base href="/">\n<link rel="canonical"', 1))
+        for fname, *_ in PAGES + TOWN_PAGES:
+            if fname in ("index.html", "apply.html"):
+                continue           # apply.html stays as built (noindex, unlisted) for the hiring work
+            open(os.path.join(ROOT, fname), "w").write(forward_stub())
+        open(os.path.join(ROOT, "robots.txt"), "w").write(f"User-agent: *\nAllow: /\nSitemap: {CONFIG['DOMAIN']}/sitemap.xml\n")
+        open(os.path.join(ROOT, "sitemap.xml"), "w").write(
+            f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>{CONFIG["DOMAIN"]}/</loc></url></urlset>\n')
+        return
     for fname, title, desc, fn in PAGES + TOWN_PAGES + [("404.html", "Page Not Found | Caring Companions Oklahoma", "Page not found.", page_404)]:
         body = fn()
         if fname in PAGE_PHOTO:
