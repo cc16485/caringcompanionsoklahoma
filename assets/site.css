@@ -397,3 +397,16 @@ p { margin: 0 0 16px; }
 .how-steps span { color: var(--muted, #55677a); font-size: 14px; }
 @media (max-width: 860px) { .how-steps { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 480px) { .how-steps { grid-template-columns: 1fr; } }
+
+/* ---------- Real-people photos ---------- */
+.hero-split { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr); gap: 56px; align-items: center; }
+.ph-photo { margin: 0; border-radius: 18px; overflow: hidden; aspect-ratio: 4 / 5; max-height: 460px; width: 100%; justify-self: end; box-shadow: 0 18px 40px rgba(13,54,95,.12); }
+.ph-photo img, .strip-photo img { width: 100%; height: 100%; object-fit: cover; }
+.photo-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 32px; }
+.strip-photo { margin: 0; position: relative; border-radius: 16px; overflow: hidden; aspect-ratio: 3 / 4; }
+.strip-photo figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 28px 16px 14px; color: #fff; font-weight: 600; font-size: 15px; background: linear-gradient(transparent, rgba(13,54,95,.78)); }
+@media (max-width: 960px) {
+  .hero-split { grid-template-columns: 1fr; gap: 28px; }
+  .ph-photo { order: -1; aspect-ratio: 16 / 10; max-height: 340px; }
+  .photo-strip { grid-template-columns: repeat(2, 1fr); }
+}

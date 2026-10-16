@@ -359,6 +359,7 @@ def page_index():
     <div class="card">{icon("i-tv")}<h3>Stay connected</h3><p>HomeTogether TV puts family video calls on their TV, with camera-free safety sensors that respect their privacy and independence. <a href="https://tryhometogether.com/">Learn more</a></p></div>
     <div class="card">{icon("i-calendar")}<h3>Start small</h3><p>Join with one or two visits a week and add more only if it helps.</p></div>
   </div>
+  {photo_strip()}
 </div></section>
 
 <section class="section tight"><div class="shell">
@@ -1285,6 +1286,54 @@ TOWN_PAGES = [(f"companion-care-{t[0]}-ok.html", f"Companion Care in {t[1]}, OK 
                f"Weekday companion care for older adults in {t[1]}, Oklahoma: company, meals, errands, rides and seated exercise. $30/hour. Opening June 2027.",
                make_town_page(t)) for t in TOWN_INFO]
 
+# Real-people photos (720x1280 portrait webp in assets/photos), shown beside page headings
+PHOTOS = {
+    "visit-sofa": ("A caregiver, an older woman and her daughter looking at a book together on the sofa", "50% 55%"),
+    "recognizes": ("An older woman smiling as her caregiver arrives at the door", "50% 30%"),
+    "arrives-porch": ("A caregiver greeting an older woman at her front door", "50% 40%"),
+    "lunch-kitchen": ("A caregiver and an older woman sharing lunch and coffee at the kitchen table", "50% 55%"),
+    "welcome-porch": ("A caregiver being welcomed on the front porch by an older woman and her daughter", "50% 35%"),
+    "garden-visit": ("A caregiver and an older woman walking arm in arm in the garden", "50% 40%"),
+    "caregiver-training": ("A caregiver working through her training at a table by the window", "50% 40%"),
+    "interview": ("A caregiver applicant talking with our office team at an interview", "50% 45%"),
+    "photo-album": ("A companion and an older man looking through a photo album", "50% 50%"),
+    "puzzle": ("A caregiver and an older man working on a jigsaw puzzle together", "50% 50%"),
+    "coffee-break": ("Two women laughing over coffee at a cafe table", "50% 50%"),
+    "garden-walk": ("An older woman with a walker on a garden path beside her companion", "50% 60%"),
+    "phone-with-mom": ("A daughter showing her mother something on her phone at the kitchen table", "50% 45%"),
+}
+PAGE_PHOTO = {
+    "services.html": "puzzle", "pricing.html": "lunch-kitchen", "getting-started.html": "arrives-porch",
+    "service-area.html": "garden-walk", "resources.html": "phone-with-mom", "medicare-guide.html": "coffee-break",
+    "about.html": "welcome-porch", "careers.html": "caregiver-training", "contact.html": "recognizes",
+    "join.html": "visit-sofa",
+}
+TOWN_PHOTOS = ["arrives-porch", "visit-sofa", "garden-visit", "lunch-kitchen", "puzzle", "photo-album", "recognizes", "welcome-porch"]
+
+def photo(name, cls="ph-photo", eager=False):
+    alt, pos = PHOTOS[name]
+    load = 'fetchpriority="high"' if eager else 'loading="lazy"'
+    return (f'<figure class="{cls}"><img src="assets/photos/{name}.webp" alt="{alt}" width="720" height="1280" '
+            f'style="object-position:{pos}" {load} decoding="async"></figure>')
+
+def with_hero_photo(body, name):
+    """Put a photo beside the first page-hero's text."""
+    start = body.find('<section class="page-hero"><div class="shell">')
+    if start < 0:
+        return body
+    open_tag = '<section class="page-hero"><div class="shell">'
+    end = body.find('</div></section>', start)
+    inner = body[start + len(open_tag):end]
+    new = (f'<section class="page-hero has-photo"><div class="shell hero-split"><div class="hero-text">{inner}</div>'
+           f'{photo(name, eager=True)}</div></section>')
+    return body[:start] + new + body[end + len('</div></section>'):]
+
+def photo_strip():
+    pics = ["visit-sofa", "puzzle", "garden-walk", "lunch-kitchen"]
+    caps = ["Good company", "Something to do", "Getting outside", "A hot lunch"]
+    figs = "".join(photo(n, "strip-photo").replace("</figure>", f"<figcaption>{c}</figcaption></figure>") for n, c in zip(pics, caps))
+    return f'<div class="photo-strip">{figs}</div>'
+
 PAGES = [
     ("index.html", "Weekday Companion Care in Mustang, OK | Caring Companions",
      "Weekday companion care in Mustang, OK. The Good Day Club helps older adults stay independent longer: company, meals, gentle exercise, errands and rides to appointments. Monday to Friday, 8 to 6.", page_index),
@@ -1315,6 +1364,11 @@ PAGES = [
 def build():
     for fname, title, desc, fn in PAGES + TOWN_PAGES + [("404.html", "Page Not Found | Caring Companions Oklahoma", "Page not found.", page_404)]:
         body = fn()
+        if fname in PAGE_PHOTO:
+            body = with_hero_photo(body, PAGE_PHOTO[fname])
+        elif fname.startswith("companion-care-"):
+            i = [t[0] for t in TOWN_PAGES].index(fname)
+            body = with_hero_photo(body, TOWN_PHOTOS[i % len(TOWN_PHOTOS)])
         with open(os.path.join(ROOT, fname), "w") as f:
             f.write(head(fname, title, desc) + header(fname) + body + footer())
     robots = ("User-agent: *\nDisallow: /\n" if CONFIG["PREVIEW"]
