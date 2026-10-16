@@ -155,7 +155,7 @@ def head(page, title, desc):
 '''
 
 def header(page):
-    bar = (f'<div class="open-bar"><b>We\'re not open yet.</b> We\'re getting licensed and plan to open in Mustang in {CONFIG["OPENING"]}. '
+    bar = (f'<div class="open-bar"><b>Caring for Missouri families since 2017, now coming to Oklahoma.</b> Our Mustang office plans to open in {CONFIG["OPENING"]}. '
            f'<a href="index.html#notify">Families: get an email when we open</a><span class="hide-sm"> &middot; '
            f'<a href="careers.html#notify">Caregivers: {CONFIG["CAREGIVER_PAY"]}, get an email to apply</a> &middot; '
            f'<button type="button" data-app-preview>See how booking will work</button></span></div>\n')
@@ -320,7 +320,7 @@ def page_index():
   <div class="notify-head">
     <p class="kicker">Coming to Mustang</p>
     <h2>We're not open yet. We're getting licensed.</h2>
-    <p class="lede">Our application for an Oklahoma companion service license is in progress, and we plan to open in {CONFIG["OPENING"]}. Until then we can't book visits, but you can get an email the day we're ready.</p>
+    <p class="lede">Caring Companions has served families across Southwest Missouri since 2017, and we're adding a second office here in Mustang. Our application for an Oklahoma companion service license is in progress, and we plan to open in {CONFIG["OPENING"]}. Until then we can't book visits, but you can get an email the day we're ready.</p>
   </div>
   <div class="grid grid-2 notify-grid">
     <div class="card notify-card">
@@ -628,7 +628,7 @@ def page_about():
   <p class="lede">We help seniors keep living safely, comfortably, and with dignity in the place that means the most to them, home. We've been doing it one family at a time since 2017.</p>
 </div></section>
 
-<section class="section"><div class="shell" style="max-width:900px">
+<section class="section"><div class="shell" style="max-width:1200px">
   <ol class="story">
     <li><p class="yr">2017 &middot; Where it began</p><h2>A family decides home shouldn't be negotiable.</h2>
       <p>Caring Companions started in Springfield, Missouri. We had watched too many people moved into facilities before they were ready, not because they couldn't live at home, but because they didn't have the right support.</p></li>
@@ -669,7 +669,7 @@ def page_about():
   </div>
 </div></section>
 
-<section class="section pale"><div class="shell" style="max-width:900px">
+<section class="section pale"><div class="shell" style="max-width:1200px">
   <p class="kicker">How we work with families</p>
   <h2>Honest, even when the answer isn't us.</h2>
   <p class="lede">We believe families deserve clear information before making a hard decision. We publish our rate so you don't have to call five agencies for a ballpark, and we'll always point you toward the care that's right for your situation, even when it isn't ours.</p>
@@ -933,7 +933,7 @@ def page_resources():
 </div></section>
 {"".join(blocks)}
 <section class="section tight"><div class="shell">
-  <div class="card" style="max-width:860px">
+  <div class="card" style="max-width:1100px">
     <h3>Staying close from a distance</h3>
     <p>HomeTogether TV, from the Caring Companions family, puts video calls and gentle check-ins right on your loved one's TV. It works anywhere in the country.</p>
     <a href="https://tryhometogether.com/">Learn about HomeTogether TV</a>
@@ -1038,7 +1038,7 @@ def page_guide():
   <div class="edge-note"><p><b>Good to know before you count on it.</b> Respite visits don't roll over. Unused visits expire June 30 and a fresh year starts July 1, so families who save them for a rainy day tend to lose them. We can only bill Medicare once GUIDE enrollment is approved, and how much respite is available follows Medicare's rules, not ours.</p></div>
 </div></section>
 
-<section class="section"><div class="shell" style="max-width:860px">
+<section class="section"><div class="shell" style="max-width:1200px">
   <h2>Questions families actually ask</h2>
   <div class="faqs">{faq}</div>
 </div></section>
@@ -1263,7 +1263,7 @@ def make_town_page(t):
   <p style="margin-top:18px"><a href="outings.html">See all outing ideas and plan a sample week</a></p>
 </div></section>
 
-<section class="section"><div class="shell" style="max-width:860px">
+<section class="section"><div class="shell" style="max-width:1200px">
   <h2>Questions families in {name} ask</h2>
   <div class="faqs">
     <details class="faq"><summary>Do you serve all of {name}?</summary><p>We serve ZIP code{"s" if len(zips) > 1 else ""} {zip_list}. If you're not sure about your address, call us at {v("PHONE", "(405) phone")} or check your ZIP on our <a href="service-area.html">service area map</a>.</p></details>
