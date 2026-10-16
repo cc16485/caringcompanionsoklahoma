@@ -63,7 +63,7 @@
         form.classList.add('join-done');
         status.classList.add('ok');
         status.textContent = row.kind === 'caregiver'
-          ? 'Thank you! You’re on our list for the Mustang team.'
+          ? 'Thank you! We have your application for the Mustang team. If it looks like a fit, we’ll call you to set up an interview.'
           : 'Thank you! You’re on our opening list.';
         try { if (window.ccTrack) window.ccTrack('join_list', { kind: row.kind, site: C.site }); } catch (e2) {}
       }).catch(function () {

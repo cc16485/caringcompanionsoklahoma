@@ -10,6 +10,24 @@
     });
   }
 
+  // Dropdown menus: open on click, close on outside click or Escape
+  var groups = document.querySelectorAll('.nav-group');
+  function closeAll(except) {
+    groups.forEach(function (g) { if (g !== except) { g.classList.remove('open'); g.querySelector('.nav-top').setAttribute('aria-expanded', 'false'); } });
+  }
+  groups.forEach(function (g) {
+    var b = g.querySelector('.nav-top');
+    b.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = !g.classList.contains('open');
+      closeAll(g);
+      g.classList.toggle('open', open);
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+  document.addEventListener('click', function (e) { if (!e.target.closest('.nav-group')) closeAll(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeAll(); });
+
   var form = document.getElementById('lead-form');
   if (!form) return;
   var status = form.querySelector('.form-status');

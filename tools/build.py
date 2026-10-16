@@ -80,14 +80,21 @@ def icon(name, cls="icon"):
 MARK = '<img class="logo" src="assets/cc-logo.png" alt="Caring Companions" width="800" height="206">'
 
 NAV = [
-    ("index.html", "Home"),
-    ("services.html", "Services"),
-    ("outings.html", "Outings"),
+    ("Care", [
+        ("services.html", "What we do", "Companionship, meals, errands, rides"),
+        ("index.html#good-day-club", "The Good Day Club", "More good years at home"),
+        ("outings.html", "Good days out", "Outings near you"),
+        ("medicare-guide.html", "Medicare GUIDE respite", "Dementia respite Medicare may cover"),
+        ("getting-started.html", "Getting started", "From first call to first visit"),
+    ]),
     ("pricing.html", "Pricing"),
     ("service-area.html", "Service area"),
     ("resources.html", "Resources"),
-    ("about.html", "About"),
-    ("careers.html", "Careers"),
+    ("About", [
+        ("about.html", "Our story", "A family company since 2017"),
+        ("contact.html", "Contact", "Call or send us a note"),
+        ("join.html", "Join the opening list", "Opening June 2027"),
+    ]),
 ]
 
 def schema(page):
@@ -143,13 +150,25 @@ def head(page, title, desc):
 '''
 
 def header(page):
-    bar = (f'<div class="open-bar">Opening in Mustang in {CONFIG["OPENING"]}. <a href="join.html">Join the opening list</a> or <button type="button" data-app-preview>see how booking will work</button></div>\n')
+    bar = (f'<div class="open-bar">Opening in Mustang in {CONFIG["OPENING"]}. <a href="join.html">Join the opening list</a><span class="hide-sm">, <button type="button" data-app-preview>see how booking will work</button>,</span> or <a href="careers.html">apply to join our team</a>.</div>\n')
     bar += ('<div class="preview-bar"><b>Preview only.</b> Not yet published. '
            'Highlighted items are still to be filled in.</div>\n') if CONFIG["PREVIEW"] else ""
     current = ' aria-current="page"'
-    links = "\n    ".join(
-        f'<a href="{href}"{current if href == page else ""}>{label}</a>'
-        for href, label in NAV[1:])
+    parts = []
+    for n, item in enumerate(NAV):
+        if isinstance(item[1], list):
+            label, kids = item
+            if label == "Care" and not CONFIG["GUIDE"]:
+                kids = [k for k in kids if k[0] != "medicare-guide.html"]
+            here = any(k[0] == page for k in kids)
+            items = "".join(f'<a href="{h}"{current if h == page else ""}><b>{t}</b><small>{sub}</small></a>' for h, t, sub in kids)
+            parts.append(f'<div class="nav-group"><button type="button" class="nav-top{" is-here" if here else ""}" aria-expanded="false" aria-controls="dd{n}">{label}<i class="caret" aria-hidden="true"></i></button>'
+                         f'<div class="nav-dd" id="dd{n}">{items}</div></div>')
+        else:
+            href, label = item
+            parts.append(f'<a class="nav-top" href="{href}"{current if href == page else ""}>{label}</a>')
+    parts.append(f'<a class="nav-top nav-hiring" href="careers.html"{current if page == "careers.html" else ""}>We\'re hiring</a>')
+    links = "\n    ".join(parts)
     return f'''{bar}<header class="site-header">
   <div class="header-inner">
     <a class="brand" href="index.html" aria-label="Caring Companions Oklahoma, home">{MARK}
@@ -158,7 +177,7 @@ def header(page):
     <nav class="nav" id="nav" aria-label="Main">
     {links}
     <a class="nav-phone" href="{phone_href()}">{v("PHONE", "(405) phone")}</a>
-    <a class="btn" href="join.html">Join the opening list</a>
+    <a class="btn" href="join.html">Join the list</a>
     </nav>
   </div>
 </header>
@@ -217,6 +236,7 @@ def footer():
 </div>
 <script src="assets/site.js"></script>
 <script src="assets/app-preview.js" defer></script>
+<script>window.JOIN_CONFIG = {json.dumps({"site": "oklahoma", "fallback": ("Please call " + CONFIG["PHONE"] + ".") if CONFIG.get("PHONE") else "Please call or email us instead."})};</script>
 <script src="assets/join.js" defer></script>
 </body>
 </html>
@@ -586,14 +606,59 @@ def page_about():
 
 {cta_band()}'''
 
+def apply_form():
+    return '''<form class="form card join-form" data-join novalidate>
+  <input type="radio" name="kind" value="caregiver" checked hidden>
+  <label>Your name<input name="name" autocomplete="name" required maxlength="120"></label>
+  <div class="join-row"><label>Phone<input name="phone" type="tel" autocomplete="tel" maxlength="40"></label>
+  <label>Email<input name="email" type="email" autocomplete="email" maxlength="200"></label></div>
+  <label>Your ZIP code<input name="zip" inputmode="numeric" autocomplete="postal-code" maxlength="5"></label>
+  <label>Caregiving experience<select name="experience"><option value="">Choose one</option><option>None yet, but I'd love to learn</option><option>Less than 1 year</option><option>1 to 3 years</option><option>More than 3 years</option></select></label>
+  <fieldset class="join-ints"><legend>A little more about you</legend>
+    <label><input type="checkbox" name="interests" value="weekdays-all"> I can work most weekdays, 8am to 6pm</label>
+    <label><input type="checkbox" name="interests" value="weekdays-some"> I can work some weekdays</label>
+    <label><input type="checkbox" name="interests" value="drives"> I have a driver's license, a car and auto insurance</label>
+    <label><input type="checkbox" name="interests" value="cna-or-hha"> I have a CNA, HHA or similar certificate</label>
+  </fieldset>
+  <label>When could you start?<select name="timing"><option value="">Choose one</option><option>Early 2027</option><option>Spring 2027</option><option>When you open in June 2027</option></select></label>
+  <label>Why would you like to be a companion caregiver? <span class="og-opt">(optional)</span><textarea name="message" maxlength="2000"></textarea></label>
+  <label class="join-consent"><input type="checkbox" name="may_contact" checked> It's OK to contact me about working with Caring Companions Oklahoma.</label>
+  <label class="hp-field" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
+  <button class="btn" type="submit">Send my application</button>
+  <p class="join-status" role="status" aria-live="polite"></p>
+  <p class="form-note">We only use your details to contact you about working with us. We never sell or share them.</p>
+</form>'''
+
+def job_schema():
+    job = {
+        "@context": "https://schema.org", "@type": "JobPosting",
+        "title": "Companion Caregiver",
+        "description": "<p>Caring Companions Oklahoma is hiring companion caregivers in Mustang, Oklahoma ahead of our June 2027 opening. Spend weekday daytime hours with older adults: conversation, games and walks, light housekeeping, meal preparation, errands, rides to appointments, a simple seated exercise routine and medication reminders. No nights, no weekends, and no hands-on personal care. Every caregiver passes a fingerprint background check through Oklahoma's OKSCREEN program.</p>",
+        "datePosted": "2026-10-16", "validThrough": "2027-06-30T23:59",
+        "hiringOrganization": {"@type": "Organization", "name": "Caring Companions Oklahoma", "sameAs": CONFIG["DOMAIN"], "logo": CONFIG["DOMAIN"] + "/assets/cc-logo.png"},
+        "jobLocation": {"@type": "Place", "address": {"@type": "PostalAddress", "addressLocality": "Mustang", "addressRegion": "OK", "postalCode": "73064", "addressCountry": "US"}},
+        "directApply": True,
+    }
+    return '<script type="application/ld+json">' + json.dumps(job) + '</script>'
+
 def page_careers():
-    return f'''<section class="page-hero"><div class="shell">
-  <p class="kicker">Careers <span class="open-chip">Building our team now</span></p>
-  <h1>Companion caregivers in Mustang.</h1>
-  <p class="lede">We open in Mustang in {CONFIG["OPENING"]}, and we're building our team now. Daytime weekday hours, no nights, no weekends, and work that matters: keeping someone company and helping them stay at home.</p>
+    return f'''{job_schema()}
+<section class="page-hero"><div class="shell">
+  <p class="kicker">Careers <span class="open-chip">Now hiring</span></p>
+  <h1>Now hiring companion caregivers in Mustang.</h1>
+  <p class="lede">We're licensed and building our Mustang team ahead of our {CONFIG["OPENING"]} opening. Daytime weekday hours, no nights, no weekends, and work that matters: keeping someone company and helping them stay at home.</p>
+  <div class="btn-row" style="margin-top:18px"><a class="btn" href="#apply">Apply now</a><a class="btn btn-outline" href="{phone_href()}">Call {v("PHONE", "(405) phone")}</a></div>
 </div></section>
 
-<section class="section"><div class="shell grid grid-2" style="align-items:start">
+<section class="section"><div class="shell">
+  <div class="grid grid-3">
+    <div class="card">{icon("i-sun")}<h3>Daytime, weekdays</h3><p>Monday to Friday, between 8am and 6pm. Evenings and weekends are yours.</p></div>
+    <div class="card">{icon("i-heart-honey")}<h3>Work that matters</h3><p>You're the reason someone's week has something to look forward to.</p></div>
+    <div class="card">{icon("i-handshake")}<h3>A local team</h3><p>You're supervised from our Mustang office, with people who know you by name.</p></div>
+  </div>
+</div></section>
+
+<section class="section alt" id="apply"><div class="shell grid grid-2" style="align-items:start">
   <div>
     <h2>The job</h2>
     <ul class="checks">
@@ -605,19 +670,19 @@ def page_careers():
       <li>Giving family caregivers a break</li>
     </ul>
     <p>This is companion work. You won't be asked to give hands-on personal care.</p>
-    <h3>Schedule</h3>
-    <p>Monday to Friday, between 8am and 6pm.</p>
     <h3>What you'll need</h3>
     <ul class="checks">
       <li>A kind, patient, dependable way with people</li>
       <li>To pass a fingerprint background check through Oklahoma's OKSCREEN program</li>
       <li>A valid driver's license and auto insurance, if you'll drive clients</li>
     </ul>
+    <h3>What happens next</h3>
+    <p>We read every application. If it looks like a fit, we'll call you to set up an interview in Mustang.</p>
   </div>
   <div>
-    <h2>Get on the list</h2>
-    <p>Tell us a little about yourself and we'll invite you to apply when hiring for Mustang begins.</p>
-    {join_form("caregiver")}
+    <h2>Apply now</h2>
+    <p>It takes about two minutes. No resume needed.</p>
+    {apply_form()}
   </div>
 </div></section>
 '''
@@ -1008,8 +1073,8 @@ PAGES = [
      "Medicare's GUIDE program may pay for dementia respite visits for families in Mustang and west Oklahoma City. See who qualifies.", page_guide)] if CONFIG["GUIDE"] else []) + [
     ("about.html", "About Us | Caring Companions Oklahoma",
      "A family-owned company caring for families since 2017, now serving Mustang, Oklahoma with companion care.", page_about),
-    ("careers.html", "Companion Caregiver Jobs in Mustang, OK | Caring Companions",
-     "Weekday daytime companion caregiver jobs in Mustang, Oklahoma. No nights, no weekends.", page_careers),
+    ("careers.html", "Now Hiring: Companion Caregiver Jobs in Mustang, OK | Caring Companions",
+     "Now hiring companion caregivers in Mustang, Oklahoma. Weekday daytime hours, no nights, no weekends. Apply in two minutes, no resume needed.", page_careers),
     ("contact.html", "Contact Us | Caring Companions Oklahoma",
      "Reach Caring Companions in Mustang, OK, or join our opening list. Weekday companion care opening June 2027.", page_contact),
     ("join.html", "Join Our Opening List | Caring Companions Oklahoma",
