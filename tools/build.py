@@ -158,6 +158,29 @@ def head(page, title, desc):
 <a class="skip" href="#main">Skip to content</a>
 '''
 
+# Booking preview settings. Same pop-up and profile layout as mo-care.com/app (assets/app-preview.js
+# is a copy of that site's file); Oklahoma keeps weekdays 8 to 6. Sample caregivers only, not real people.
+AP_CONFIG_OK = {
+    "tagline": "The Good Day Club", "weekdaysOnly": True, "startHour": 8, "endHour": 18,
+    "minHours": 4, "rate": 30, "rateLabel": "Companion care", "checkLabel": "Fingerprint background check",
+    "joinHref": "join.html", "joinLabel": "Join the opening list",
+    "footnote": "Preview with sample information. The app launches when we open.",
+    "caregivers": [
+        {"k": "grace", "n": "Grace", "full": "Grace M.", "photo": "assets/photos/sample-caregiver-grace.webp", "yrs": "Caregiving 6 years", "town": "Mustang", "drives": True,
+         "about": "Grace is a retired school secretary who loves a good card game, her garden and cooking a Sunday-style lunch on a Tuesday. She is calm, cheerful and easy to have around the house.",
+         "exp": "Grace has spent six years helping older adults at home with meals, light housekeeping and company. She is used to gentle reminders and keeping a day on track.",
+         "why": "Grace says she enjoys the small moments most, like a shared laugh over coffee. She likes leaving a home a little brighter than she found it."},
+        {"k": "andre", "n": "Andre", "full": "Andre W.", "photo": "assets/photos/sample-caregiver-andre.webp", "yrs": "Caregiving 3 years", "town": "Yukon", "drives": True,
+         "about": "Andre is easygoing and patient, and he is always up for a game of checkers or a Thunder game on the radio. He never minds a long drive to an appointment.",
+         "exp": "Andre has three years as a companion for older adults, with rides to appointments, grocery runs and a hand around the house.",
+         "why": "Andre enjoys the conversations most. He says everyone has a story worth hearing, and he likes being the person who shows up."},
+        {"k": "rosa", "n": "Rosa", "full": "Rosa G.", "photo": "assets/photos/sample-caregiver-rosa.webp", "yrs": "Caregiving 4 years", "town": "Tuttle", "drives": True,
+         "about": "Rosa is a baker, a walker and a good listener. She speaks English and Spanish, and she loves hearing the old stories over a cup of coffee.",
+         "exp": "Rosa has spent four years helping older adults at home with meals, errands and good company. Before that, she helped care for her grandmother for many years.",
+         "why": "Rosa says the best part of her day is seeing someone light up when she walks in. She likes knowing the family can relax because someone is there."},
+    ],
+}
+
 def header(page):
     bar = (f'<div class="open-bar"><b>Caring for Missouri families since 2017, now coming to Oklahoma.</b> Our Mustang office plans to open in {CONFIG["OPENING"]}. '
            f'<a href="index.html#notify">Families: get an email when we open</a><span class="hide-sm"> &middot; '
@@ -248,6 +271,7 @@ def footer():
   <a class="btn" href="join.html">Join the list</a>
 </div>
 <script src="assets/site.js"></script>
+<script>window.AP_CONFIG = {json.dumps(AP_CONFIG_OK)};</script>
 <script src="assets/app-preview.js" defer></script>
 <script>window.JOIN_CONFIG = {json.dumps({"site": "oklahoma", "fallback": ("Please call " + CONFIG["PHONE"] + ".") if CONFIG.get("PHONE") else "Please call or email us instead."})};</script>
 <script src="assets/join.js" defer></script>
