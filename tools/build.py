@@ -1289,7 +1289,6 @@ TOWN_PAGES = [(f"companion-care-{t[0]}-ok.html", f"Companion Care in {t[1]}, OK 
 # Real-people photos (720x1280 portrait webp in assets/photos), shown beside page headings
 PHOTOS = {
     "visit-sofa": ("A caregiver, an older woman and her daughter looking at a book together on the sofa", "50% 55%"),
-    "recognizes": ("An older woman smiling as her caregiver arrives at the door", "50% 30%"),
     "arrives-porch": ("A caregiver greeting an older woman at her front door", "50% 40%"),
     "lunch-kitchen": ("A caregiver and an older woman sharing lunch and coffee at the kitchen table", "50% 55%"),
     "welcome-porch": ("A caregiver being welcomed on the front porch by an older woman and her daughter", "50% 35%"),
@@ -1305,14 +1304,18 @@ PHOTOS = {
 PAGE_PHOTO = {
     "services.html": "puzzle", "pricing.html": "lunch-kitchen", "getting-started.html": "arrives-porch",
     "service-area.html": "garden-walk", "resources.html": "phone-with-mom", "medicare-guide.html": "coffee-break",
-    "about.html": "welcome-porch", "careers.html": "caregiver-training", "contact.html": "recognizes",
+    "about.html": "welcome-porch", "careers.html": "caregiver-training", "contact.html": "photo-album",
     "join.html": "visit-sofa",
 }
-TOWN_PHOTOS = ["arrives-porch", "visit-sofa", "garden-visit", "lunch-kitchen", "puzzle", "photo-album", "recognizes", "welcome-porch"]
+TOWN_PHOTOS = ["arrives-porch", "visit-sofa", "garden-visit", "lunch-kitchen", "puzzle", "photo-album", "garden-walk", "welcome-porch"]
 
 def photo(name, cls="ph-photo", eager=False):
+    """Heading photos use the 5:4 crop (name-wide.webp, 1080x864); the homepage row uses the tall 720x1280."""
     alt, pos = PHOTOS[name]
     load = 'fetchpriority="high"' if eager else 'loading="lazy"'
+    if cls == "ph-photo":
+        return (f'<figure class="{cls}"><img src="assets/photos/{name}-wide.webp" alt="{alt}" width="1080" height="864" '
+                f'{load} decoding="async"></figure>')
     return (f'<figure class="{cls}"><img src="assets/photos/{name}.webp" alt="{alt}" width="720" height="1280" '
             f'style="object-position:{pos}" {load} decoding="async"></figure>')
 
