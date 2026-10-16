@@ -583,25 +583,70 @@ def page_about():
     return f'''<section class="page-hero"><div class="shell">
   <p class="kicker">About us</p>
   <h1>A family company, now in Mustang.</h1>
-  <p class="lede">Caring Companions began in Springfield, Missouri in 2017 with one belief: people deserve to stay in their own homes for as long as they safely can, with the right support.</p>
+  <p class="lede">We help seniors keep living safely, comfortably, and with dignity in the place that means the most to them, home. We've been doing it one family at a time since 2017.</p>
 </div></section>
 
-<section class="section"><div class="shell grid grid-2">
-  <div>
-    <h2>Where we come from</h2>
-    <p>We had watched too many people move into facilities before they were ready, not because they couldn't live at home, but because they didn't have the right support. So we started helping families, one at a time.</p>
-    <p>Word spread from family to family. We're still family owned, never a franchise, and we've kept the rules that made us different. Caregivers are our own employees, never contractors, and every plan is built around the person's routines, preferences and story.</p>
+<section class="section"><div class="shell" style="max-width:900px">
+  <ol class="story">
+    <li><p class="yr">2017 &middot; Where it began</p><h2>A family decides home shouldn't be negotiable.</h2>
+      <p>Caring Companions started in Springfield, Missouri. We had watched too many people moved into facilities before they were ready, not because they couldn't live at home, but because they didn't have the right support.</p></li>
+    <li><p class="yr">The years since &middot; Earning trust</p><h2>Growing the way trust grows: one family telling another.</h2>
+      <p>Word spread from family to family. We kept the rules that made us different: caregivers are our own employees, never contractors, and every plan is built around the person's routines, preferences and story.</p></li>
+    <li><p class="yr">{CONFIG["OPENING"]} &middot; Mustang</p><h2>Companion care, built around the workday.</h2>
+      <p>Our Oklahoma office brings that same approach to Mustang and the towns around it, starting with what so many working families ask for first: a dependable, friendly companion during the day, and <a href="index.html#good-day-club">The Good Day Club</a> to help their loved one stay independent longer.</p></li>
+  </ol>
+</div></section>
+
+<section class="section alt"><div class="shell">
+  <p class="kicker">What we stand for</p>
+  <h2>Four things that don't change.</h2>
+  <div class="grid grid-4" style="margin-top:24px">
+    <div class="card">{icon("i-family")}<h3>Family owned</h3><p>We're not a franchise. Caring Companions is family owned, and our compassion and quality of care run higher because of that personal touch.</p></div>
+    <div class="card">{icon("i-handshake")}<h3>Our own employees</h3><p>Every caregiver is screened and employed by us, never a contractor. We handle the taxes, insurance and backup support.</p></div>
+    <div class="card">{icon("i-sun")}<h3>Here for the workday</h3><p>Monday to Friday, 8am to 6pm, with our Mustang office open the whole time a caregiver is with your loved one.</p></div>
+    <div class="card">{icon("i-sprout")}<h3>Always improving</h3><p>We're forward-thinking and always getting better, because our mission is to make life better for seniors and the families who love them.</p></div>
   </div>
+</div></section>
+
+<section class="section"><div class="shell grid grid-2" style="align-items:start">
   <div>
-    <h2>Why Mustang</h2>
-    <p>Our Oklahoma office brings that same approach to Mustang and the towns around it, built around what so many working families ask for first: a dependable, friendly companion while they're at work.</p>
-    <p>You'll talk to a local team that knows your loved one by name, and every caregiver is supervised from our Mustang office.</p>
+    <p class="kicker">Our caregivers</p>
+    <h2>More than a job. A calling.</h2>
+    <p>Our caregivers come from all walks of life, united by one mission: to help older adults live with dignity, comfort and joy at home. We look for compassion, kindness and patience, and we follow Oklahoma's licensing requirements for companion services, including a fingerprint background check for every caregiver.</p>
+    <p><a href="careers.html">We're hiring in Mustang</a></p>
   </div>
+  <div class="card">
+    <h3>How we match</h3>
+    <ul class="checks">
+      <li>Matched by personality, experience and what your loved one enjoys</li>
+      <li>Your caregiver knows the service plan before the first visit</li>
+      <li>Preferences and routines honored from day one</li>
+      <li>Focused on meaningful connection, not just tasks</li>
+      <li>We keep checking the fit. If it isn't working, tell us and we'll match someone else.</li>
+    </ul>
+  </div>
+</div></section>
+
+<section class="section pale"><div class="shell" style="max-width:900px">
+  <p class="kicker">How we work with families</p>
+  <h2>Honest, even when the answer isn't us.</h2>
+  <p class="lede">We believe families deserve clear information before making a hard decision. We publish our rate so you don't have to call five agencies for a ballpark, and we'll always point you toward the care that's right for your situation, even when it isn't ours.</p>
+  <p>Most families start smaller than they expect and adjust after the first few weeks. Needs change, and a plan written in March may be wrong by August. Yours is meant to be rewritten when that happens.</p>
 </div></section>
 
 <section class="section dark"><div class="shell center">
   <p class="kicker">Our promise</p>
   <p class="promise">"We will care for your loved one with the same respect, kindness, and dignity we would want for our own family."</p>
+  <p>Home isn't just where someone lives. It's where memories, comfort and identity live. We're honored to help our clients stay there, for as long as possible.</p>
+</div></section>
+
+<section class="section"><div class="shell">
+  <p class="kicker">One company, care wherever home is</p>
+  <h2>Part of the Caring Companions family.</h2>
+  <div class="grid grid-2" style="margin-top:22px">
+    <a class="card card-link" href="https://mo-care.com/"><h3>Caring Companions Missouri</h3><p>In-home care across Southwest Missouri, where it all started in 2017.</p></a>
+    <a class="card card-link" href="https://tryhometogether.com/"><h3>HomeTogether TV</h3><p>Family video calls and camera-free safety sensors on your loved one's TV, anywhere in the country.</p></a>
+  </div>
 </div></section>
 
 {cta_band()}'''

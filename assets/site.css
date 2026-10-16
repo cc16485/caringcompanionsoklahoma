@@ -369,3 +369,11 @@ p { margin: 0 0 16px; }
 
 @media (max-width: 1240px) and (min-width: 1061px) { .nav .nav-phone { display: none; } .nav { gap: 16px; } }
 @media (max-width: 640px) { .hide-sm { display: none; } .open-bar { font-size: 14px; padding: 8px 12px; } }
+
+/* About timeline */
+.story { list-style: none; padding: 0; margin: 0; }
+.story li { position: relative; padding: 0 0 34px 34px; border-left: 2px solid #e4dfd2; margin-left: 8px; }
+.story li:last-child { border-left-color: transparent; padding-bottom: 0; }
+.story li::before { content: ""; position: absolute; left: -9px; top: 4px; width: 16px; height: 16px; border-radius: 50%; background: var(--honey); border: 3px solid var(--bg); box-shadow: 0 0 0 2px var(--honey); }
+.story .yr { font-size: 12.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--honey-text); margin: 0 0 6px; }
+.story h2 { font-size: clamp(22px, 2.6vw, 26px); margin-bottom: 8px; }
