@@ -20,7 +20,7 @@ GUIDE_CHECKBOX = '      <label><input type="checkbox" name="interests" value="gu
 CONFIG = {
     "PREVIEW": False,                    # live since 2026-10-16 (licensed; opening June 2027)
     "OPENING": "June 2027",
-    "GUIDE": False,                     # True only after EmpowerMe/Continuum confirm Oklahoma in writing              # licensed; visits start then                    # False only once the OSDH license is issued
+    "GUIDE": True,                     # True only after EmpowerMe/Continuum confirm Oklahoma in writing              # licensed; visits start then                    # False only once the OSDH license is issued
     "DOMAIN": "https://caringcompanionsoklahoma.com",
     "PHONE": "(405) 500-1758",                      # e.g. "(405) 555-0123"
     "AFTER_HOURS_PHONE": "(405) 500-1758",         # license requires one, answered outside office hours
