@@ -57,11 +57,11 @@ try:
         ok(f'{w}: on to step 2', pg.is_visible('[data-step="2"]') and 'step 2 of 3' in pg.inner_text('.apply-progress').lower())
         pg.click('[data-go="2"]'); pg.wait_for_timeout(100)
         ok(f'{w}: step 2 needs every answer', 'every question' in pg.inner_text('.join-status') and len(CALLS) == 1)
-        fill2(pg, drive='no'); pg.click('[data-go="2"]'); pg.wait_for_timeout(300)
+        fill2(pg); pg.click('[data-go="2"]'); pg.wait_for_timeout(300)
         d = CALLS[-1].get('p_data', {})
-        ok(f'{w}: step 2 saves the answers to the same application (no to driving is fine)',
+        ok(f'{w}: step 2 saves the answers to the same application (drives, license, insurance)',
            CALLS[-1].get('p_id') == '11111111-2222-4333-8444-555555555555' and d.get('age_ok') is True and d.get('work_auth') is True
-           and d.get('can_pass_background') is True and d.get('has_transport') is False and d.get('experience_years') == '1 to 3 years'
+           and d.get('can_pass_background') is True and d.get('has_transport') is True and d.get('has_license') is True and d.get('has_insurance') is True and d.get('experience_years') == '1 to 3 years'
            and d.get('availability') == 'All weekdays, 8am to 6pm' and d.get('role_answers', {}).get('When can you start') == 'Spring 2027'
            and 'decline_reason' not in d, CALLS[-1])
         ok(f'{w}: on to step 3', pg.is_visible('[data-step="3"]'))
@@ -76,14 +76,15 @@ try:
         ctx.close()
     # the knockouts
     for label, kw, why in [('no to OKSCREEN', {'oks': 'no'}, 'OKSCREEN'), ('under 18', {'age': 'no'}, '18 or older'),
-                           ('no weekday hours', {'wk': 'No weekday hours'}, 'weekdays between 8am and 6pm')]:
+                           ('no weekday hours', {'wk': 'No weekday hours'}, 'weekdays between 8am and 6pm'),
+                           ('can\'t drive clients (her rule 2026-10-16: every employee drives)', {'drive': 'no'}, 'Every Companion drives clients')]:
         ctx = b.new_context(); pg = ctx.new_page(); pg.route('**/rest/v1/rpc/apply_save', fake); CALLS.clear(); FAKE.clear()
         pg.goto(f'http://127.0.0.1:{PORT}/apply.html'); pg.wait_for_timeout(300); fill1(pg); pg.click('[data-go="1"]'); pg.wait_for_timeout(250)
         fill2(pg, **kw); pg.click('[data-go="2"]'); pg.wait_for_timeout(300)
         d = CALLS[-1].get('p_data', {}); t = pg.inner_text('[data-step="stop"]')
         ok(f'{label}: saved with the reason, a kind explanation, no step 3', d.get('decline_reason') and pg.is_visible('[data-step="stop"]') and why in t and '(405) 500-1758' in t and not pg.is_visible('[data-step="3"]'), [d, t])
         ctx.close()
-    ok('driving and under a year never turn anyone away (checked above: no to driving went on to step 3)', True)
+    ok('under a year of experience never turns anyone away (the experience answer has no stop)', 'experience_years' not in open(os.path.join(ROOT, 'assets/apply.js')).read().split('var stop =')[1].split(';')[0])
     # a missed interview before: the database refuses, the page explains
     ctx = b.new_context(); pg = ctx.new_page(); pg.route('**/rest/v1/rpc/apply_save', fake); CALLS.clear(); FAKE.clear(); FAKE['noshow'] = True
     pg.goto(f'http://127.0.0.1:{PORT}/apply.html'); pg.wait_for_timeout(300); fill1(pg); pg.click('[data-go="1"]'); pg.wait_for_timeout(300)
