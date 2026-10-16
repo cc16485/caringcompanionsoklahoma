@@ -414,3 +414,19 @@ p { margin: 0 0 16px; }
   .ph-photo::before { inset: 12px -12px -12px 12px; }
   .photo-strip { grid-template-columns: repeat(2, 1fr); }
 }
+.towns li:has(a):hover { border-color: var(--teal); }
+.footer-towns { margin: 28px 0 0; font-size: 14.5px; line-height: 1.9; }
+
+/* 806: the Companion application (apply.html) */
+.apply-form h3 { margin: 0 0 4px; }
+.apply-form [data-step] { display: grid; gap: 14px; }
+.apply-progress { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--honey-text); }
+.apply-progress:empty { display: none; }
+.apply-q { display: grid; gap: 6px; }
+.apply-q legend { margin-bottom: 4px; }
+.apply-yn, .apply-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.apply-yn label, .apply-opts label { display: flex !important; gap: 8px; align-items: center; font-weight: 500 !important; border: 1.5px solid var(--border); border-radius: 10px; padding: 8px 14px; cursor: pointer; }
+.apply-yn input, .apply-opts input { width: 18px !important; height: 18px; accent-color: var(--teal); flex: none; margin: 0; }
+.apply-yn label:has(input:checked), .apply-opts label:has(input:checked) { border-color: var(--teal); background: var(--teal-pale); }
+.apply-form .btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.join-apply { margin: 0; }
