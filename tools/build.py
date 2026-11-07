@@ -152,40 +152,15 @@ def head(page, title, desc):
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css">
-<link rel="stylesheet" href="assets/app-preview.css">
 {schema(page)}</head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 '''
 
-# Booking preview settings. Same pop-up and profile layout as mo-care.com/app (assets/app-preview.js
-# is a copy of that site's file); Oklahoma keeps weekdays 8 to 6. Sample caregivers only, not real people.
-AP_CONFIG_OK = {
-    "tagline": "The Good Day Club", "weekdaysOnly": True, "startHour": 8, "endHour": 18,
-    "minHours": 4, "rate": 30, "rateLabel": "Companion care", "checkLabel": "Fingerprint background check",
-    "joinHref": "join.html", "joinLabel": "Join the opening list",
-    "footnote": "Preview with sample information. The app launches when we open.",
-    "caregivers": [
-        {"k": "grace", "n": "Grace", "full": "Grace M.", "photo": "assets/photos/sample-caregiver-grace.webp", "yrs": "Caregiving 6 years", "town": "Mustang", "drives": True,
-         "about": "Grace is a retired school secretary who loves a good card game, her garden and cooking a Sunday-style lunch on a Tuesday. She is calm, cheerful and easy to have around the house.",
-         "exp": "Grace has spent six years helping older adults at home with meals, light housekeeping and company. She is used to gentle reminders and keeping a day on track.",
-         "why": "Grace says she enjoys the small moments most, like a shared laugh over coffee. She likes leaving a home a little brighter than she found it."},
-        {"k": "andre", "n": "Andre", "full": "Andre W.", "photo": "assets/photos/sample-caregiver-andre.webp", "yrs": "Caregiving 3 years", "town": "Yukon", "drives": True,
-         "about": "Andre is easygoing and patient, and he is always up for a game of checkers or a Thunder game on the radio. He never minds a long drive to an appointment.",
-         "exp": "Andre has three years as a companion for older adults, with rides to appointments, grocery runs and a hand around the house.",
-         "why": "Andre enjoys the conversations most. He says everyone has a story worth hearing, and he likes being the person who shows up."},
-        {"k": "rosa", "n": "Rosa", "full": "Rosa G.", "photo": "assets/photos/sample-caregiver-rosa.webp", "yrs": "Caregiving 4 years", "town": "Tuttle", "drives": True,
-         "about": "Rosa is a baker, a walker and a good listener. She speaks English and Spanish, and she loves hearing the old stories over a cup of coffee.",
-         "exp": "Rosa has spent four years helping older adults at home with meals, errands and good company. Before that, she helped care for her grandmother for many years.",
-         "why": "Rosa says the best part of her day is seeing someone light up when she walks in. She likes knowing the family can relax because someone is there."},
-    ],
-}
-
 def header(page):
     bar = (f'<div class="open-bar"><b>Caring for Missouri families since 2017, now coming to Oklahoma.</b> Our Mustang office plans to open in {CONFIG["OPENING"]}. '
            f'<a href="index.html#notify">Families: get an email when we open</a><span class="hide-sm"> &middot; '
-           f'<a href="careers.html#notify">Caregivers: {CONFIG["CAREGIVER_PAY"]}, get an email to apply</a> &middot; '
-           f'<button type="button" data-app-preview>See how booking will work</button></span></div>\n')
+           f'<a href="careers.html#notify">Caregivers: {CONFIG["CAREGIVER_PAY"]}, get an email to apply</a></span></div>\n')
     bar += ('<div class="preview-bar"><b>Preview only.</b> Not yet published. '
            'Highlighted items are still to be filled in.</div>\n') if CONFIG["PREVIEW"] else ""
     current = ' aria-current="page"'
@@ -271,8 +246,6 @@ def footer():
   <a class="btn" href="join.html">Join the list</a>
 </div>
 <script src="assets/site.js"></script>
-<script>window.AP_CONFIG = {json.dumps(AP_CONFIG_OK)};</script>
-<script src="assets/app-preview.js" defer></script>
 <script>window.JOIN_CONFIG = {json.dumps({"site": "oklahoma", "fallback": ("Please call " + CONFIG["PHONE"] + ".") if CONFIG.get("PHONE") else "Please call or email us instead."})};</script>
 <script src="assets/join.js" defer></script>
 </body>
@@ -280,14 +253,13 @@ def footer():
 '''
 
 def cta_band(title="Be one of our first families.",
-             text=f"We're not open yet. We're getting licensed and plan to open in Mustang in {CONFIG['OPENING']}. Join the list and we'll email you when we open, or take a look at how booking will work."):
+             text=f"We're not open yet. We're getting licensed and plan to open in Mustang in {CONFIG['OPENING']}. Join the list and we'll email you when we open."):
     return f'''<section class="section tight"><div class="shell">
   <div class="cta-band">
     <h2>{title}</h2>
     <p>{text}</p>
     <div class="btn-row" style="justify-content:center">
       <a class="btn btn-light" href="join.html">Join the opening list</a>
-      <button type="button" class="btn btn-outline" style="color:#fff;border-color:#fff" data-app-preview>See how booking works</button>
     </div>
   </div>
 </div></section>
@@ -333,7 +305,6 @@ def page_index():
     <p class="lede">A regular companion for Mom or Dad, Monday to Friday between 8 and 6. Good company, a hot lunch, the errands done and a ride to the doctor, so they stay independent longer and the workday stops being the part you worry about.</p>
     <div class="btn-row">
       <a class="btn" href="#notify">{icon("i-mail", "")} Email me when you open</a>
-      <button type="button" class="btn btn-outline" data-app-preview>{icon("i-mobile", "")} See how booking works</button>
     </div>
     <ul class="trust-row">
       <li>{icon("i-clock", "")} Monday to Friday, 8am to 6pm</li>
@@ -362,17 +333,6 @@ def page_index():
       {caregiver_notify()}
     </div>
   </div>
-  <div class="card how-book">
-    <h3>How booking will work, step by step</h3>
-    <ol class="how-steps">
-      <li><b>Pick a day</b><span>Monday to Friday</span></li>
-      <li><b>Pick a time</b><span>between 8am and 6pm</span></li>
-      <li><b>Choose what to do</b><span>lunch, outings, exercise</span></li>
-      <li><b>Pick your caregiver</b><span>see their profile first</span></li>
-      <li><b>Review and book</b><span>see the cost before you confirm</span></li>
-    </ol>
-    <button type="button" class="btn" data-app-preview>{icon("i-mobile", "")} Try the booking app</button>
-  </div>
 </div></section>
 
 <section class="section" id="good-day-club"><div class="shell">
@@ -388,21 +348,6 @@ def page_index():
     <div class="card">{icon("i-calendar")}<h3>Start small</h3><p>Join with one or two visits a week and add more only if it helps.</p></div>
   </div>
   {photo_strip()}
-</div></section>
-
-<section class="section tight"><div class="shell">
-  <div class="peek">
-    <div class="peek-phone" aria-hidden="true"><div class="peek-screen">
-      <span class="peek-k">The Good Day Club</span><b>Tue, 8am to 12pm</b>
-      <span class="peek-row">Seated exercise</span><span class="peek-row">Cook lunch together</span><span class="peek-row">Medication reminder</span>
-      <span class="peek-btn">Book this visit</span></div></div>
-    <div>
-      <p class="kicker">Sneak peek</p>
-      <h2>Booking a visit will take about a minute.</h2>
-      <p class="lede">Our app lets you pick a day, choose what your loved one would like to do, and book. Try it now with sample information.</p>
-      <div class="btn-row"><button type="button" class="btn" data-app-preview>See how booking works</button><a class="btn btn-outline" href="join.html">Join the opening list</a></div>
-    </div>
-  </div>
 </div></section>
 
 <section class="section pale edge"><div class="shell">
@@ -965,13 +910,7 @@ def page_join():
 <section class="section"><div class="shell grid grid-2" style="align-items:start">
   {join_form()}
   <div>
-    <div class="card app-teaser">
-      <p class="kicker">Sneak peek</p>
-      <h3>Booking a visit will take about a minute.</h3>
-      <p>Pick a day, choose what they'd like to do, and you're set. Try it now with sample information.</p>
-      <button type="button" class="btn" data-app-preview>See how booking works</button>
-    </div>
-    <div class="card" style="margin-top:18px">
+    <div class="card">
       <h3>What happens next</h3>
       <ul class="checks">
         <li>Your name goes on our list. Nothing is booked and there's nothing to pay.</li>
@@ -1496,8 +1435,6 @@ def coming_soon_page():
 .cs-card p {{ font-size: 15px; color: var(--muted); margin-bottom: 12px; }}
 .cs-card .form {{ gap: 10px; }}
 .cs-card .btn {{ width: 100%; }}
-.cs-app {{ margin: 18px 0 0; font-size: 15.5px; }}
-.cs-app a {{ color: var(--honey-text); font-weight: 600; }}
 .cs-foot {{ border-top: 1px solid var(--border); padding: 18px 20px 26px; text-align: center; font-size: 14px; color: var(--muted); }}
 .cs-foot a {{ color: var(--honey-text); }}
 @media (max-width: 900px) {{ .cs-main {{ grid-template-columns: 1fr; }} .cs-photo {{ order: -1; aspect-ratio: 16 / 10; }} }}
@@ -1543,7 +1480,6 @@ def coming_soon_page():
         </form>
       </div>
     </div>
-    <p class="cs-app">Curious how booking will work? <a href="https://mo-care.com/app">Try the app preview our Missouri families see</a>.</p>
   </div>
   <div class="cs-photo"><img src="assets/photos/garden-visit-wide.webp" alt="A caregiver and an older woman walking together in a garden" loading="eager"></div>
 </main>

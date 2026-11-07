@@ -315,7 +315,7 @@ p { margin: 0 0 16px; }
 
 /* Opening (pre-launch) */
 .open-bar { background: var(--honey); color: #3d2a05; text-align: center; font-size: 15px; font-weight: 600; padding: 9px 16px; }
-.open-bar a, .open-bar button { color: #0D365F; font: inherit; font-weight: 700; background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; }
+.open-bar a { color: #0D365F; font: inherit; font-weight: 700; background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; }
 .open-chip { display: inline-block; margin-left: 8px; background: var(--honey); color: #3d2a05; border-radius: 999px; padding: 2px 10px; font-size: 11.5px; letter-spacing: .06em; vertical-align: 1px; }
 .join-form legend { font-weight: 600; color: var(--ink); font-size: 15px; margin-bottom: 8px; }
 .join-form fieldset { border: 0; padding: 0; margin: 0; }
@@ -334,18 +334,7 @@ p { margin: 0 0 16px; }
 .join-status.ok { color: var(--teal-deep); background: var(--teal-pale); padding: 12px 14px; border-radius: 10px; }
 .join-status.err { color: #8a2d1f; }
 .join-form [hidden] { display: none !important; }
-.app-teaser { background: linear-gradient(160deg, #EAF4F6, #fff 70%); }
 @media (max-width: 640px) { .join-kinds, .join-row { grid-template-columns: 1fr; } }
-
-/* App sneak peek */
-.peek { display: grid; grid-template-columns: 280px 1fr; gap: 48px; align-items: center; background: linear-gradient(135deg, #EAF4F6, #faf9f6 60%); border: 1px solid var(--border); border-radius: 22px; padding: 36px 40px; }
-.peek-phone { width: 230px; height: 400px; border: 9px solid var(--navy); border-radius: 36px; background: #faf9f6; box-shadow: 0 24px 50px rgba(13,54,95,.22); padding: 26px 14px 14px; justify-self: center; transform: rotate(-4deg); }
-.peek-screen { display: grid; gap: 9px; }
-.peek-k { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--honey-text); }
-.peek-screen b { font-family: var(--serif); font-size: 19px; color: var(--navy); }
-.peek-row { display: block; background: var(--teal-pale); border: 1.5px solid var(--teal); border-radius: 10px; padding: 9px 10px; font-size: 13px; font-weight: 600; color: var(--teal-darkest); }
-.peek-btn { margin-top: 14px; background: var(--teal); color: #fff; text-align: center; border-radius: 10px; padding: 11px; font-size: 14px; font-weight: 700; }
-@media (max-width: 800px) { .peek { grid-template-columns: 1fr; padding: 28px 20px; gap: 24px; } .peek-phone { transform: none; height: 340px; } }
 
 /* ---------- Grouped navigation (2026-10-16) ---------- */
 .nav-top { position: relative; display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 15px; font-weight: 500; color: var(--ink); background: none; border: 0; padding: 8px 2px; cursor: pointer; text-decoration: none; white-space: nowrap; }
@@ -389,14 +378,6 @@ p { margin: 0 0 16px; }
 .notify-card .notify-form { margin-top: 12px; padding: 0; box-shadow: none; border: 0; background: none; }
 .notify-card h3 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .pay-chip { background: var(--teal); color: #fff; border-radius: 999px; padding: 3px 12px; font-family: Inter, system-ui, sans-serif; font-size: 14px; font-weight: 700; }
-.how-book { margin-top: 22px; }
-.how-steps { list-style: none; counter-reset: hs; padding: 0; margin: 14px 0 18px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-.how-steps li { counter-increment: hs; background: var(--teal-pale); border-radius: 14px; padding: 12px; display: grid; gap: 2px; }
-.how-steps li::before { content: counter(hs); display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--teal); color: #fff; font-weight: 700; font-size: 14px; margin-bottom: 6px; }
-.how-steps b { color: var(--navy); }
-.how-steps span { color: var(--muted, #55677a); font-size: 14px; }
-@media (max-width: 860px) { .how-steps { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 480px) { .how-steps { grid-template-columns: 1fr; } }
 
 /* ---------- Real-people photos ---------- */
 .page-hero.has-photo { padding: 56px 0 64px; }
